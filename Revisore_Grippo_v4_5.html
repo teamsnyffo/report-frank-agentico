@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Revisore Grippo v4.5 — revisione automatica report Frank Merenda</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/gitbrent/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  :root{
+    --ink:#1b2230; --ink-soft:#4a566b; --ink-faint:#8b95a7;
+    --paper:#eef0f4; --panel:#ffffff; --line:#dce0e8; --line-strong:#c4cad6;
+    --primary:#26456e; --primary-soft:#e7edf5; --primary-ink:#16304d;
+    --accent:#a85a1a; --accent-soft:#f7ede1;
+    --ins:#0f6b4f; --ins-bg:#e6f3ec; --del:#a63446; --del-bg:#fbeaec;
+    --auto:#2b6a8f; --auto-bg:#e6f0f6;
+    --ok:#0f6b4f; --warn:#a85a1a; --err:#a63446;
+    --radius:10px; --radius-sm:6px;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --serif:Georgia,"Iowan Old Style","Times New Roman",serif;
+    --mono:"SFMono-Regular",Menlo,Consolas,monospace;
+    --shadow:0 1px 2px rgba(20,30,50,.06),0 4px 16px rgba(20,30,50,.05);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  h1,h2,h3{margin:0;font-weight:640;letter-spacing:-.01em}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 20px 80px}
+
+  header.top{position:sticky;top:0;z-index:20;background:rgba(238,240,244,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .top-in{max-width:1180px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:14px}
+  .brand{display:flex;align-items:baseline;gap:10px}
+  .brand .mark{font-family:var(--serif);font-size:21px;font-weight:700;color:var(--primary);letter-spacing:-.02em}
+  .brand .mark em{color:var(--accent);font-style:normal}
+  .brand .sub{font-size:12px;color:var(--ink-faint)}
+  .top-spacer{flex:1}
+  .chip{font-size:11px;font-weight:600;color:var(--ink-soft);border:1px solid var(--line-strong);padding:3px 9px;border-radius:100px;background:var(--panel);display:inline-flex;gap:6px;align-items:center}
+  .chip b{color:var(--ink);font-family:var(--mono)}
+
+  /* TABS */
+  .tabs{display:flex;gap:4px;margin:20px 0 22px;border-bottom:1px solid var(--line)}
+  .tab{font:inherit;font-size:13.5px;font-weight:600;color:var(--ink-faint);background:transparent;border:0;border-bottom:2px solid transparent;padding:10px 16px;cursor:pointer;display:flex;align-items:center;gap:8px;margin-bottom:-1px}
+  .tab .n{font-family:var(--mono);font-size:11px;width:18px;height:18px;border-radius:50%;display:grid;place-items:center;background:var(--paper);color:var(--ink-soft);border:1px solid var(--line-strong)}
+  .tab.on{color:var(--primary);border-bottom-color:var(--primary)}
+  .tab.on .n{background:var(--primary);color:#fff;border-color:var(--primary)}
+  .tab.done .n{background:var(--ok);color:#fff;border-color:var(--ok)}
+  .tab:disabled{opacity:.4;cursor:not-allowed}
+  .pane{display:none} .pane.on{display:block}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;margin-bottom:16px;box-shadow:var(--shadow)}
+  .card > h2{font-size:15px;display:flex;align-items:center;gap:9px;margin-bottom:4px}
+  .card .hint{font-size:13px;color:var(--ink-soft);margin:2px 0 16px}
+
+  label.fld{display:block;font-size:12.5px;font-weight:600;color:var(--ink-soft);margin-bottom:6px}
+  input[type=text],input[type=password],select{width:100%;font:inherit;font-size:14px;color:var(--ink);background:var(--panel);border:1px solid var(--line-strong);border-radius:var(--radius-sm);padding:10px 12px}
+  input:focus,select:focus{outline:2px solid var(--primary-soft);border-color:var(--primary)}
+  .row{display:flex;gap:14px;flex-wrap:wrap}
+  .row > *{flex:1;min-width:180px}
+
+  .btn{font:inherit;font-weight:600;font-size:14px;cursor:pointer;border-radius:var(--radius-sm);padding:10px 18px;border:1px solid transparent;transition:.14s}
+  .btn.primary{background:var(--primary);color:#fff}
+  .btn.primary:hover{background:#1d3757}
+  .btn.ghost{background:var(--panel);color:var(--ink);border-color:var(--line-strong)}
+  .btn.ghost:hover{border-color:var(--ink-soft)}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .btn.sm{padding:6px 12px;font-size:12.5px}
+
+  .drop{border:1.5px dashed var(--line-strong);border-radius:var(--radius);padding:26px;text-align:center;color:var(--ink-soft);cursor:pointer;transition:.14s;background:#fbfcfe}
+  .drop:hover,.drop.hot{border-color:var(--primary);background:var(--primary-soft)}
+  .drop strong{color:var(--ink)}
+  .file-tag{display:inline-flex;align-items:center;gap:8px;font-size:13px;background:var(--primary-soft);color:var(--primary);border-radius:100px;padding:5px 12px;margin-top:12px;font-weight:600}
+
+  .opt{border:1px solid var(--line);border-radius:var(--radius-sm);padding:12px 14px;background:#fbfcfe}
+  .opt .t{font-size:13px;font-weight:600;margin-bottom:8px}
+  .opt .d{font-size:12px;color:var(--ink-faint);margin-top:8px;line-height:1.4}
+  .opts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;align-items:stretch}
+  .opts-grid .opt{display:flex;flex-direction:column;padding:16px 16px 18px}
+  .opts-grid .opt .t{min-height:38px;margin-bottom:10px}
+  .opts-grid .opt .seg{align-self:flex-start}
+  .opts-grid .opt .d{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+  .seg{display:inline-flex;border:1px solid var(--line-strong);border-radius:100px;overflow:hidden;background:var(--panel)}
+  .seg button{font:inherit;font-size:12.5px;font-weight:600;border:0;background:transparent;color:var(--ink-soft);padding:6px 14px;cursor:pointer}
+  .seg button.on{background:var(--primary);color:#fff}
+  .seg.acc button.on{background:var(--accent)}
+
+  /* status list */
+  .statlist{display:flex;flex-direction:column;gap:2px;margin-top:6px}
+  .strow{display:flex;align-items:center;gap:12px;padding:9px 12px;border:1px solid var(--line);border-radius:var(--radius-sm);background:#fbfcfe}
+  .strow .dot{width:9px;height:9px;border-radius:50%;background:var(--line-strong);flex:none}
+  .strow.wait .dot{background:var(--line-strong)}
+  .strow.run .dot{background:var(--accent);animation:pulse 1s infinite}
+  .strow.done .dot{background:var(--ok)}
+  .strow.warn .dot{background:var(--warn)}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+  .strow .nm{flex:1;font-size:13.5px;font-weight:600}
+  .strow .nm .lt{font-size:11px;color:var(--accent);font-weight:600;margin-left:8px}
+  .strow .st{font-size:12px;color:var(--ink-faint);font-family:var(--mono)}
+  .strow.warn .st{color:var(--warn)}
+
+  .metrics{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 14px}
+  .metric{flex:1;min-width:150px;border:1px solid var(--line);border-radius:var(--radius-sm);padding:12px 14px;background:#fbfcfe}
+  .metric .v{font-family:var(--mono);font-size:20px;font-weight:600;color:var(--primary)}
+  .metric .l{font-size:11.5px;color:var(--ink-faint);margin-top:2px}
+  .metric small{font-size:11px;color:var(--ink-faint);font-family:var(--sans)}
+
+  .log{font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);max-height:170px;overflow:auto;margin-top:14px;background:#fbfcfe;border:1px solid var(--line);border-radius:var(--radius-sm);padding:10px}
+  .log div{padding:1px 0}
+  .log .v21{color:var(--primary)} .log .w{color:var(--warn)} .log .e{color:var(--err)}
+
+  .summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:16px}
+  .kpi{border:1px solid var(--line);border-radius:var(--radius-sm);padding:12px 14px;background:#fbfcfe}
+  .kpi .n{font-family:var(--mono);font-size:22px;font-weight:600;color:var(--primary)}
+  .kpi .l{font-size:11.5px;color:var(--ink-faint);margin-top:2px}
+
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+  .toolbar .sp{flex:1}
+  .filterbar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+  .fbtn{font:inherit;font-size:12px;font-weight:600;border:1px solid var(--line-strong);background:var(--panel);color:var(--ink-soft);border-radius:100px;padding:5px 12px;cursor:pointer}
+  .fbtn.on{background:var(--primary);color:#fff;border-color:var(--primary)}
+
+  .sec{border:1px solid var(--line);border-radius:var(--radius);margin-bottom:12px;overflow:hidden;background:var(--panel)}
+  .sec > .head{display:flex;align-items:center;gap:12px;padding:12px 16px;cursor:pointer;background:#fbfcfe;border-bottom:1px solid transparent}
+  .sec.open > .head{border-bottom-color:var(--line)}
+  .sec .head .name{font-weight:640;font-size:14px;flex:1}
+  .sec .head .name .letter{font-size:11px;color:var(--accent);font-weight:600;margin-left:8px}
+  .sec .head .cnt{font-size:12px;color:var(--ink-faint);font-family:var(--mono)}
+  .sec .head .chev{color:var(--ink-faint);transition:.15s}
+  .sec.open .head .chev{transform:rotate(90deg)}
+  .sec .body{display:none;padding:6px 16px 16px}
+  .sec.open .body{display:block}
+
+  .hunk{border:1px solid var(--line);border-left:3px solid var(--line-strong);border-radius:var(--radius-sm);padding:10px 12px;margin:10px 0;background:#fff}
+  .hunk.k-auto{border-left-color:var(--auto)} .hunk.k-mech{border-left-color:var(--auto)}
+  .hunk.k-judg{border-left-color:var(--accent)} .hunk.k-cut{border-left-color:var(--del)}
+  .hunk.rejected{opacity:.5;background:#fafafa}
+  .hunk .meta{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+  .tag{font-size:10.5px;font-weight:700;letter-spacing:.02em;padding:2px 7px;border-radius:100px;text-transform:uppercase}
+  .tag.auto,.tag.mech{background:var(--auto-bg);color:var(--auto)}
+  .tag.judg{background:var(--accent-soft);color:var(--accent)}
+  .tag.cut{background:var(--del-bg);color:var(--del)}
+  .hunk .cat{font-size:11.5px;color:var(--ink-faint)}
+  .hunk .acts{margin-left:auto;display:flex;gap:6px}
+  .hunk .acts button{font:inherit;font-size:11.5px;font-weight:600;border:1px solid var(--line-strong);background:#fff;border-radius:100px;padding:3px 11px;cursor:pointer;color:var(--ink-soft)}
+  .hunk .acts button.on.acc{background:var(--ins-bg);border-color:var(--ins);color:var(--ins)}
+  .hunk .acts button.on.rej{background:var(--del-bg);border-color:var(--del);color:var(--del)}
+  .diff{font-family:var(--serif);font-size:15px;line-height:1.62;color:var(--ink)}
+  .diff del{color:var(--del);background:var(--del-bg);text-decoration:line-through;text-decoration-thickness:1px;padding:0 2px;border-radius:3px;font-weight:600}
+  .diff ins{color:var(--ins);background:var(--ins-bg);text-decoration:none;padding:0 2px;border-radius:3px;font-weight:600}
+
+  .sigbar{display:flex;align-items:center;gap:8px;margin:6px 0 12px;font-size:12.5px;color:var(--ink-soft)}
+  .sigbar .cnt{font-weight:600}
+  .sigbar .sp{flex:1}
+  .signal{display:flex;align-items:flex-start;gap:12px;border:1px solid var(--accent);border-left-width:4px;border-radius:var(--radius-sm);padding:11px 14px;margin:8px 0;background:var(--accent-soft);cursor:pointer;transition:opacity .15s,background .15s}
+  .signal.off{opacity:.5;background:var(--panel);border-color:var(--line-strong)}
+  .signal>input[type=checkbox]{margin-top:3px;width:17px;height:17px;accent-color:var(--accent);flex:0 0 auto;cursor:pointer}
+  .signal .sinfo{flex:1;min-width:0}
+  .signal .sh{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+  .signal .st{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--accent)}
+  .signal .type{font-size:10.5px;font-weight:700;text-transform:uppercase;background:var(--accent);color:#fff;padding:2px 8px;border-radius:100px}
+  .signal .copy{margin-left:auto;font:inherit;font-size:11.5px;font-weight:600;border:1px solid var(--accent);color:var(--accent);background:#fff;border-radius:100px;padding:3px 12px;cursor:pointer}
+  .signal .copy.done{background:var(--accent);color:#fff}
+  .signal .ttl{font-weight:640;font-size:14px;margin-bottom:3px}
+  .signal .ref{font-family:var(--serif);font-style:italic;color:var(--ink-soft);font-size:13px}
+  .signal .data{font-size:13px;color:var(--ink);background:#fff;border:1px solid #e6c9a8;border-radius:var(--radius-sm);padding:8px 10px;white-space:pre-wrap;font-family:var(--mono)}
+  .signal .note{font-size:12px;color:var(--ink-soft);margin-top:6px}
+
+  .arch{display:flex;flex-direction:column;gap:8px}
+  .arow{display:flex;align-items:center;gap:14px;padding:12px 14px;border:1px solid var(--line);border-radius:var(--radius-sm);background:#fbfcfe}
+  .arow .ai{flex:1}
+  .arow .an{font-weight:640;font-size:14px}
+  .arow .ad{font-size:12px;color:var(--ink-faint);margin-top:2px}
+  .arow .as{font-size:12px;color:var(--ink-soft);font-family:var(--mono)}
+  .arow .aa{display:flex;gap:6px}
+
+  .banner{border-radius:var(--radius-sm);padding:10px 14px;font-size:13px;margin-bottom:12px}
+  .banner.warn{background:var(--accent-soft);color:#7a4212;border:1px solid #e6c9a8}
+  .empty{color:var(--ink-faint);font-size:13px;padding:20px;text-align:center;border:1px dashed var(--line-strong);border-radius:var(--radius-sm)}
+  .hidden{display:none!important}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <div class="brand"><span class="mark">Revisore <em>Grippo</em></span><span class="sub">v4.5 · retry automatico su sovraccarico API (429/5xx/529)</span></div>
+    <div class="top-spacer"></div>
+    <span class="chip" id="chipTimer">⏱ <b id="tTimer">0:00</b></span>
+    <span class="chip" id="chipCost">≈ <b id="tCost">$0.00</b></span>
+    <span class="chip" id="chipModel">Sonnet 5</span>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="tabs" id="tabs">
+    <button class="tab on" data-tab="setup"><span class="n">1</span> Setup</button>
+    <button class="tab" data-tab="run" id="tabRun" disabled><span class="n">2</span> Revisione</button>
+    <button class="tab" data-tab="review" id="tabReview" disabled><span class="n">3</span> Controllo &amp; Export</button>
+    <button class="tab" data-tab="archive"><span class="n">4</span> Archivio</button>
+  </div>
+
+  <!-- ===== TAB 1: SETUP ===== -->
+  <div class="pane on" data-pane="setup">
+    <div class="card">
+      <h2>Chiave API e report grezzo</h2>
+      <p class="hint">La chiave resta solo nel browser. Carica il report <b>non revisionato</b> in .docx: l'agente lavora sul testo grezzo, il branding cliente si applica dopo.</p>
+      <div class="row">
+        <div style="flex:2"><label class="fld" for="apiKey">Chiave API Anthropic</label>
+          <input type="password" id="apiKey" placeholder="sk-ant-..." autocomplete="off"></div>
+        <div><label class="fld" for="modelSel">Modello (modificabile)</label>
+          <input type="text" id="modelSel" list="modelList" value="claude-sonnet-5" autocomplete="off" spellcheck="false">
+          <datalist id="modelList">
+            <option value="claude-sonnet-5">Sonnet 5 (introduttivo $2/$10)</option>
+            <option value="claude-sonnet-4-5">Sonnet 4.5 ($3/$15)</option>
+            <option value="claude-sonnet-4-5-20250929">Sonnet 4.5 (snapshot)</option>
+            <option value="claude-opus-4-8">Opus 4.8 ($5/$25)</option>
+          </datalist></div>
+      </div>
+      <div style="margin-top:16px">
+        <div class="drop" id="drop">
+          <div><strong>Trascina qui il .docx</strong> oppure clicca per sceglierlo</div>
+          <div style="font-size:12px;margin-top:4px">report non revisionato — Piano Marketing o Consulenza Strategica</div>
+          <input type="file" id="fileIn" accept=".docx" class="hidden">
+        </div>
+        <div id="fileInfo"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Impostazioni di revisione</h2>
+      <p class="hint">Impostazioni fedeli a Grippo. Le meccaniche (ortografia, prequalifica, punteggiatura) sono applicate automaticamente da un layer deterministico, a prescindere dal modello.</p>
+      <div class="opts-grid">
+        <div class="opt">
+          <div class="t">Aggressività sul giudizio</div>
+          <div class="seg" data-opt="judg">
+            <button data-v="spinto" class="on">Grippo-style</button>
+            <button data-v="conservativo">Conservativo</button>
+          </div>
+          <div class="d">Grippo-style: asciuga e sostituisce il lessico impreciso avvicinandosi a Grippo. Conservativo: tocca il minimo indispensabile.</div>
+        </div>
+        <div class="opt">
+          <div class="t">Fusione frasi</div>
+          <div class="seg" data-opt="rhythm">
+            <button data-v="conservativo" class="on">Conservativa</button>
+            <button data-v="scorrevole">Scorrevole</button>
+          </div>
+          <div class="d">Unione delle frasi spezzate: conservativa unisce solo quelle palesemente casuali.</div>
+        </div>
+        <div class="opt">
+          <div class="t">Anti-anglicismo severo</div>
+          <div class="seg" data-opt="angli">
+            <button data-v="off" class="on">Off</button>
+            <button data-v="on">On</button>
+          </div>
+          <div class="d">Off (fedele a Grippo): tiene funnel, follow-up, CRM. On: applica la banned-list del tono-guida.</div>
+        </div>
+        <div class="opt">
+          <div class="t">Densità grafiche (visual planner)</div>
+          <div class="seg acc" data-opt="dens">
+            <button data-v="off">Off</button>
+            <button data-v="normale">Normale</button>
+            <button data-v="alta" class="on">Alta</button>
+          </div>
+          <div class="d">Quante tabelle/grafici l'agente propone. Off: solo se indispensabile. Normale: ~1 ogni due blocchi. Alta: ~1 per blocco (punta a 40-50 nel report). Grafici veri dove ci sono numeri, tabelle/schemi per i concetti.</div>
+        </div>
+      </div>
+      <div style="margin-top:18px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+        <button class="btn primary" id="btnRun" disabled>Avvia revisione</button>
+        <span class="hint" style="margin:0" id="preScan"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TAB 2: RUN ===== -->
+  <div class="pane" data-pane="run">
+    <div class="card">
+      <h2>Revisione in corso</h2>
+      <div class="metrics">
+        <div class="metric"><div class="v" id="mProg">0 / 0</div><div class="l">blocchi completati</div></div>
+        <div class="metric"><div class="v" id="mTime">0:00</div><div class="l">tempo trascorso</div></div>
+        <div class="metric"><div class="v" id="mCost">$0.00</div><div class="l">costo <small id="mCostEur">≈ 0,00 €</small></div></div>
+        <div class="metric"><div class="v" id="mSaved">$0.00</div><div class="l">risparmiato con la cache</div></div>
+      </div>
+      <div class="statlist" id="statlist"></div>
+      <div class="toolbar hidden" id="retryBar" style="margin:12px 0">
+        <button class="btn primary" id="btnRetry">↻ Riprova blocchi falliti</button>
+        <span class="hint" style="margin:0" id="retryInfo"></span>
+      </div>
+      <div class="log" id="log"></div>
+    </div>
+  </div>
+
+  <!-- ===== TAB 3: REVIEW ===== -->
+  <div class="pane" data-pane="review">
+    <div class="card">
+      <h2>Controllo delle modifiche</h2>
+      <p class="hint">Le correzioni <b>meccaniche/auto</b> sono già accettate. Quelle di <b>giudizio</b> le confermi tu. In fondo, le segnalazioni per tabelle e grafici con i dati pronti.</p>
+      <div class="summary" id="kpis"></div>
+      <div id="banners"></div>
+      <div class="filterbar" id="filterbar">
+        <button class="fbtn on" data-f="all">Tutte</button>
+        <button class="fbtn" data-f="judg">Solo giudizio</button>
+        <button class="fbtn" data-f="pending">Solo da confermare</button>
+      </div>
+      <div class="toolbar">
+        <button class="btn ghost sm" id="btnAcceptJudg">Accetta tutte le modifiche di giudizio</button>
+        <button class="btn ghost sm" id="btnExpandAll">Espandi tutto</button>
+        <button class="btn ghost sm" id="btnCollapseAll">Comprimi tutto</button>
+      </div>
+      <div id="sections"></div>
+
+      <h3 style="margin:26px 0 4px;font-size:14px;color:var(--accent)">Segnalazioni tabelle &amp; grafici</h3>
+      <p class="hint">I punti dove l'agente propone una grafica per far capire meglio il concetto al cliente. Spunta quelle che vuoi generare (di default tutte selezionate): all'Approva verranno create solo quelle.</p>
+      <div id="signals"></div>
+
+      <div class="card" style="margin-top:20px;border:1px solid var(--accent);background:var(--accent-soft)">
+        <h2 style="color:var(--accent)">Approva e genera le grafiche</h2>
+        <p class="hint" style="color:#7a4212">Quando la revisione ti soddisfa, approvala: le modifiche vengono bloccate e l'agente genera le grafiche PPT (tabelle e grafici) dalle segnalazioni e dalle tabelle richiamate, le integra nel documento e prepara il .pptx. La generazione fa una chiamata per grafica: con 40+ segnalazioni puo' richiedere 1-2 minuti.</p>
+        <div class="toolbar" style="margin-bottom:0">
+          <button class="btn primary" id="btnApprove">✓ Approva revisione e genera grafiche</button>
+          <span class="hint" style="margin:0" id="genStatus"></span>
+        </div>
+        <div class="statlist" id="genlist" style="margin-top:12px"></div>
+        <div class="toolbar hidden" id="finalDownloads" style="margin-top:16px">
+          <button class="btn primary" id="btnDlDoc">⬇ Scarica DOCX revisionato + grafiche</button>
+          <button class="btn primary" id="btnDlPptx">⬇ Scarica PPTX grafiche</button>
+        </div>
+      </div>
+
+      <div class="toolbar" style="margin-top:20px">
+        <button class="btn ghost" id="btnExportMd">Esporta solo testo (.md)</button>
+        <button class="btn ghost" id="btnExportDoc">Esporta .doc (senza grafiche)</button>
+        <button class="btn ghost" id="btnExportReport">Report di revisione</button>
+        <span class="sp"></span>
+        <button class="btn ghost" id="btnArchive">Salva in archivio</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TAB 4: ARCHIVE ===== -->
+  <div class="pane" data-pane="archive">
+    <div class="card">
+      <h2>Archivio revisioni</h2>
+      <p class="hint">Le revisioni completate restano salvate in questo browser (IndexedDB). Non sono condivise col team né sincronizzate tra dispositivi.</p>
+      <div class="arch" id="archlist"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================================================================
+   REVISORE GRIPPO v4.5 — revisione fedele al lavoro di Grippo.
+   Layer deterministico + modello (giudizio), timer, costo, archivio.
+   Chiamata diretta a api.anthropic.com con prompt caching.
+   ========================================================================= */
+
+/* ---- PREZZI (USD per milione di token). Sonnet 5: introduttivo fino al 31/08/2026 ($2/$10), poi $3/$15. Modificabili qui. ---- */
+const PRICING = {
+  'claude-sonnet-4-5':{ in:3.00, out:15.00, cacheWrite:3.75, cacheRead:0.30, label:'Sonnet 4.5' },
+  'claude-sonnet-5':{ in:2.00, out:10.00, cacheWrite:2.50, cacheRead:0.20, label:'Sonnet 5' },
+  'claude-opus-4-8':{ in:5.00, out:25.00, cacheWrite:6.25, cacheRead:0.50, label:'Opus 4.8' }
+};
+const USD_EUR = 0.92;      // stima di conversione, modificabile
+const DET_EUFONICA = true; // eufonica prudente (stessa vocale). Metti false se troppo rumorosa.
+
+const CFG = { API_VERSION:'2023-06-01', CHUNK_WORDS:1300, LEN_GUARD:0.06, MIN_WORDS_GUARD:60, MAX_TOKENS_CAP:24000 };
+
+/* ---- anti-meta ---- */
+const META_PATTERNS = [
+  /^\s*(certo|perfetto|ok|va bene)[.,: ].{0,120}?(riscriv|versione|editing|qui sotto|te la|ecco).{0,200}$/gim,
+  /^\s*hai ragione[.,: ].{0,220}$/gim,
+  /^\s*(ecco|qui sotto trovi)\b.{0,60}(versione|testo).{0,200}$/gim,
+  /^\s*###?\s*(verifica completezza|comunicazione all'utente|nota interna|stato del chunk).{0,200}$/gim,
+  /\[CHUNK_ALREADY_COMPLETE\]/gi,
+  // refusi di generazione AI presenti nel report grezzo: rimozione chirurgica e categorica
+  /\b(?:ti\s+|te\s+lo\s+|te\s+la\s+|lo\s+|la\s+)?riscriv[oi][^.?!\n]{0,150}?(?:compatt|prolisso|prolissa|sintetic|scorrevol|discorsiv|in\s+chat)[^.?!\n]{0,90}[.?!]?/gi,
+  /\bhai ragione[.,:]?\s+(?:lo|la|te la|te lo)\s+riscriv[^.?!\n]{0,200}[.?!]?/gi,
+  /\blo riscrivo direttamente in chat[^.?!\n]{0,180}[.?!]?/gi,
+  /\b(?:adesso|ora|di seguito|qui)\b[^.?!\n]{0,40}riscriv[oi][^.?!\n]{0,150}[.?!]?/gi
+];
+const META_PROCESS = /^\s*(nel prossimo passaggio|adesso passo al|adesso prendo|ora prendo)\b.{0,240}(costruir|sceglier|far[òo]|prender[òo]).{0,240}$/gim;
+
+const RULES_PROMPT = `Sei il revisore editoriale dei report di consulenza in stile Frank Merenda. Il tuo lavoro replica quello di Grippo, il revisore umano. Ricevi UNA sezione di un report grezzo e restituisci la stessa sezione RIPULITA.
+
+# PRINCIPIO
+Ripulisci, non riscrivere. Preserva la struttura, l'ordine e la voce. NON aggiungere contenuto nuovo. MA: Grippo interviene di piu' di quanto istintivamente faresti. Non e' un correttore di bozze timido: asciuga le ridondanze, sostituisce il lessico impreciso, ammorbidisce, sistema la punteggiatura. Le meccaniche pure (ortografia deterministica) sono gia' gestite a valle: tu concentrati sul GIUDIZIO. Nel dubbio tra "lasciare com'e'" e "migliorare avvicinandolo allo stile Grippo", MIGLIORA.
+
+# FORMATTAZIONE (obbligatorio)
+Il testo usa marcatori: **grassetto**, *corsivo*, e i titoli iniziano con # / ## / ###. DEVI mantenerli identici: non toglierli, non aggiungerne di nuovi, non spostarli. Conserva anche gli a-capo e la divisione in paragrafi. Se correggi una parola dentro **...** o *...*, lascia i marcatori al loro posto attorno al testo corretto.
+
+# COSA CORREGGERE
+1. FUSIONE FRASI SPEZZATE: unisci con virgola due frasi corte consecutive strettamente legate ("tranquillo. Deve" -> "tranquillo, deve"). MA lascia lo stacco quando e' retorico (climax, anafora, chiusura a effetto).
+2. DUE PUNTI prima di elenchi/esempi/discorso diretto ("semplici." -> "semplici:"; dice "costiamo" -> dice: "Costiamo").
+3. VOCI DI VALORE/DATO senza punto finale: togli il punto SOLO da voci che sono un valore o un dato puro (numero, orario, percentuale, importo, cella di tabella): "12:00." -> "12:00"; "18%." -> "18%". NON toglierlo dalle voci di elenco che sono TESTO/frasi (anche brevi): quelle mantengono il punto finale come nell'originale. Nel dubbio, TIENI il punto.
+4. AFFERMAZIONE -> DOMANDA nelle sequenze riflessive ("magazzino." -> "magazzino?").
+5. PUNTEGGIATURA-VIRGOLETTE (norma italiana): punto FUORI dalla chiusura; dopo virgolette che precedono subordinata: virgola+minuscola.
+6. DEPERSONALIZZAZIONE: nome cliente/azienda in terza persona -> "tu"; io/azienda -> voce del brand "noi". ECCEZIONE ASSOLUTA: nelle LETTERE (iniziale e conclusiva) NON depersonalizzare, resta in prima persona singolare Frank.
+7. SEMPLIFICAZIONE E AMMORBIDIMENTO: perifrasi modale -> presente ("deve essere" -> "e'"); futuro -> presente; imperativo advisory -> condizionale ("Puoi"/"Tu puoi" -> "Potresti"). NON ammorbidire gli imperativi voluti a effetto ("Devi capire una cosa", chiusure secche).
+8. ASCIUGATURA (TRIM) — FALLO DAVVERO: togli ripetizioni di nome/brand, qualificatori superflui, riempitivi ("una cosa precisa:", "ogni fase" ridondante, "una fotografia" quando ripetuto), URL/link spuri, e frasi che ripetono il concetto appena detto. Grippo taglia parecchio: se una parola non aggiunge nulla, via.
+9. PRECISIONE LESSICALE E DE-CALCO — VALUTAZIONE CONTESTUALE: scegli la parola piu' precisa ("prendere" -> "scegliere" dove significa scegliere; "creare difesa" -> "mettere sulla difensiva"). Il calco "si restringe/restringersi" va TOLTO dove e' goffo ("si restringe" -> "rallenta") ma MESSO dove la metafora del tubo/corsia e' appropriata. De-jargon: "ben marginato" -> "con buon margine". Traduci parole straniere NON naturalizzate (spagnolo/refusi: "tienda" -> "negozio").
+10. QA FATTUALE: correggi errori palesi (numerazioni rotte). Nel DUBBIO sul fatto, NON correggere: segnalalo.
+11. RIMOZIONE META-OUTPUT: elimina i residui conversazionali del modello e la narrazione del proprio processo. CONSERVA le transizioni rivolte al lettore ("Nel prossimo capitolo entro nel...: [Titolo]").
+
+# COSA NON TOCCARE (vincoli assoluti)
+- TIENI i prestiti inglesi consolidati del B2B: funnel, follow-up, CRM, B2B, target, competitor, lead, referral, cross-selling, upselling, brand, marketing, business, partner, advertising, LinkedIn, SAL, VMC.
+- NON cambiare il SIGNIFICATO. NON cambiare numeri, nomi propri, dati cliente, prezzi, date (salvo QA palese, che nel dubbio si segnala).
+- NON aggiungere contenuto nuovo.
+- TABELLE ESISTENTI: se ricevi una tabella markdown a pipe ("| ... |" con riga "| --- |"), PRESERVALA COSI' COM'E': stesso numero di righe/colonne, stessi "|" e riga "---". Correggi solo il testo dentro le celle. MAI trasformare una tabella in prosa, MAI fondere le celle.
+- NON costruire NUOVE tabelle nel testo: le SEGNALI soltanto (vedi output).
+
+# FORMATO DI OUTPUT
+Restituisci PRIMA il testo revisionato della sezione, verbatim tranne le correzioni, con gli stessi a-capo/paragrafi. NIENTE preamboli o commenti tuoi.
+Poi, se hai individuato punti dove una grafica aiuterebbe il CLIENTE a capire meglio, la riga esatta:
+===SEGNALAZIONI===
+e sotto UNA RIGA per grafica, in questo formato semplice (campi separati da ";"):
+- GRAFICA: <in 5-14 parole: il concetto da rendere visivo> ; ANCORA: "<frase breve ESATTA del testo dove inserirla>" ; FASE: <fase o sezione, es. Diagnosi, Posizionamento, Offerte, Competitor>
+NON servono i dati né il layout: verranno decisi ed estratti in una fase successiva. Il tuo compito qui è SOLO individuare i punti giusti e ancorarli. Non scrivere altro dopo le segnalazioni.`;
+
+const FEWSHOT = `Esempi reali di correzioni di Grippo (prima -> dopo). Calibrano TIPO e MISURA dell'intervento.
+
+Fusione frasi: "tranquillo. Deve" -> "tranquillo, deve" ; "business. Hai" -> "business, hai" ; "definitiva. E'" -> "definitiva, e'"
+Due punti / discorso diretto: "semplici." -> "semplici:" ; dice "costiamo -> dice: "Costiamo
+Voci di VALORE senza punto: "12:00." -> "12:00" ; "18%." -> "18%" (ma una voce di elenco che e' TESTO, es. "- Aumentare i margini." resta "- Aumentare i margini." col punto)
+Domande: "magazzino." -> "magazzino?" ; "migliori." -> "migliori?"
+Virgolette: "trasparenza". La -> "trasparenza", la ; negozio." -> negozio".
+Depersonalizzazione (NON lettere): "ITALGLO vuole" -> "vogliamo" ; "Giuseppe dice" -> "dici" ; "vedo" -> "vediamo"
+Ammorbidimento: "Puoi" -> "Potresti" ; "Tu puoi" -> "Potresti" (ma "Devi capire una cosa" resta)
+Semplificazione: "deve essere" -> "e'" ; "puo' entrare" -> "entra" ; "chiedero'" -> "chiedo"
+ASCIUGATURA (Grippo taglia): "ogni fase ... ogni fase" -> "" ; "una fotografia" (ripetuto) -> "" ; "una cosa precisa:" -> "" ; "quattro aree: commerciale, produzione, margini e incassi." -> "diverse aree" ; "urgenti, troppo spot" -> "urgenti"
+Lessico contestuale: "prendere" -> "scegliere" ; "creare difesa, irrigidimento" -> "farle mettere sulla difensiva, farle irrigidire" ; "si restringe." -> "rallenta." ; "diventa" -> "si restringe a" ; "ben marginato" -> "con buon margine"
+Parole straniere: "tienda" -> "negozio" ; "menaje" -> "stoviglie"
+
+NON modificare (identici): funnel, follow-up, CRM, B2B, target, competitor, referral, cross-selling, upselling, LinkedIn, marketing, brand, partner.
+TABELLE: "| Campo | Perche' serve |" con "| --- | --- |" resta tabella a pipe, riga per riga, correggendo solo il testo. MAI "CampoPerche' serve" (celle fuse).`;
+
+/* ============================ STATE ============================ */
+const S = { fileName:'', rawHtml:'', srcFmt:null, sections:[],
+  opts:{judg:'spinto', rhythm:'conservativo', angli:'off', dens:'alta'},
+  running:false, startTime:0, elapsed:0, timerId:0,
+  cost:{usd:0, saved:0, inp:0, out:0, cw:0, cr:0}, filter:'all', approved:false, graphics:null };
+
+/* ============================ UTIL ============================ */
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const wc = t => (String(t).trim().match(/\S+/g)||[]).length;
+const esc = t => String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const fmtTime = ms => { const s=Math.floor(ms/1000); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); };
+const fmtUsd = n => '$'+n.toFixed(n<1?4:2);
+const fmtEur = n => '≈ '+(n*USD_EUR).toFixed(2).replace('.',',')+' €';
+function log(msg,cls){ const l=$('#log'); const d=document.createElement('div'); if(cls)d.className=cls; d.textContent=msg; l.appendChild(d); l.scrollTop=l.scrollHeight; }
+
+function stripMeta(text){
+  let removed=0, out=text;
+  META_PATTERNS.concat([META_PROCESS]).forEach(re=>{ out=out.replace(re,()=>{ removed++; return ''; }); });
+  return {text:out.replace(/\n{3,}/g,'\n\n'), removed};
+}
+
+/* ---- LAYER DETERMINISTICO: normalizzazioni non-negoziabili che Grippo fa sempre ---- */
+function deterministicNormalize(text, origText){
+  let out=text; const hits={};
+  const bump=(k,n)=>{ hits[k]=(hits[k]||0)+n; };
+  const apply=(re,fn,label)=>{ out=out.replace(re,(...a)=>{ bump(label,1); return fn(...a); }); };
+  // prequalifica (trattino o spazio) preservando maiuscola e suffisso
+  apply(/\bPre[-\s]?qualific(\w*)/g, (m,s)=>'Prequalific'+s, 'prequalifica');
+  apply(/\bpre[-\s]?qualific(\w*)/g, (m,s)=>'prequalific'+s, 'prequalifica');
+  // upselling (senza trattino)
+  apply(/\bUp[-\s]selling\b/g, ()=>'Upselling', 'upselling');
+  apply(/\bup[-\s]selling\b/g, ()=>'upselling', 'upselling');
+  // cross-selling (con trattino)
+  apply(/\bCross\s+selling\b/g, ()=>'Cross-selling', 'cross-selling');
+  apply(/\bcross\s+selling\b/g, ()=>'cross-selling', 'cross-selling');
+  // un'email (elisione + una/un + e-mail/email/mail)
+  apply(/\bUn[ao]?\s+e-?mails?\b/g, ()=>"Un'email", "un'email");
+  apply(/\bun[ao]?\s+e-?mails?\b/g, ()=>"un'email", "un'email");
+  apply(/\bUna\s+mail\b/g, ()=>"Un'email", "un'email");
+  apply(/\buna\s+mail\b/g, ()=>"un'email", "un'email");
+  // eufonica prudente (stessa vocale)
+  if(DET_EUFONICA){
+    apply(/\ba\s+([aAàÀ]\w*)/g, (m,w)=>'ad '+w, 'eufonica');
+    apply(/\bA\s+([aAàÀ]\w*)/g, (m,w)=>'Ad '+w, 'eufonica');
+    apply(/\be\s+([eEèéÈÉ]\w*)/g, (m,w)=>'ed '+w, 'eufonica');
+    apply(/\bE\s+([eEèéÈÉ]\w*)/g, (m,w)=>'Ed '+w, 'eufonica');
+    apply(/\bo\s+([oOòÒ]\w*)/g, (m,w)=>'od '+w, 'eufonica');
+    apply(/\bO\s+([oOòÒ]\w*)/g, (m,w)=>'Od '+w, 'eufonica');
+  }
+  // RIPRISTINO del punto finale nelle voci di elenco di TESTO: il modello tende a toglierlo,
+  // ma Grippo lo TIENE. Se l'originale aveva il punto su una voce di testo e il modello l'ha
+  // tolto lasciando il resto identico, lo rimettiamo. Mai sui valori/dati puri.
+  if(origText){
+    const normKey=s=>s.toLowerCase().replace(/[’]/g,"'").replace(/\s+/g,' ').trim();
+    const isValue=s=>/^[\d.,:;%€$£\s\-\/x×]+$/i.test(s);
+    const hadPeriod={};
+    origText.split('\n').forEach(l=>{
+      const m=l.match(/^\s*-\s+(\S.*?)\.\s*$/);
+      if(m && !isValue(m[1]) && !m[1].includes('|') && !m[1].endsWith('.')) hadPeriod[normKey(m[1])]=true;
+    });
+    if(Object.keys(hadPeriod).length){
+      out=out.split('\n').map(l=>{
+        const m=l.match(/^(\s*-\s+)(\S.*[^.\s])\s*$/);
+        if(m && hadPeriod[normKey(m[2])]){ bump('punto voce ripristinato',1); return m[1]+m[2]+'.'; }
+        return l;
+      }).join('\n');
+    }
+  }
+  return {text:out, hits};
+}
+
+/* ---- split HTML del docx: prosa + tabelle (markdown a pipe) + liste ---- */
+const SECTION_ANCHORS = [
+  {re:/^car[oa]\s+[a-zàèéìòù']+/i, title:'Lettera iniziale', letter:true},
+  {re:/dove sei oggi/i, title:'Dove sei oggi'},
+  {re:/panoramica (delle|dei|4|quattro)/i, title:'Panoramica delle Fasi'},
+  {re:/\bfase\s*1\b/i, title:'Fase 1'},
+  {re:/\bfase\s*2\b/i, title:'Fase 2'},
+  {re:/\bfase\s*3\b/i, title:'Fase 3'},
+  {re:/\bfase\s*4\b/i, title:'Fase 4'},
+  {re:/lettera conclusiva|buona lettura e buono studio|in bocca al lupo/i, title:'Lettera conclusiva', letter:true}
+];
+function tableToMd(tableEl){
+  const rows=Array.from(tableEl.querySelectorAll('tr')); if(!rows.length) return '';
+  const out=[];
+  rows.forEach((tr,ri)=>{
+    const cells=Array.from(tr.querySelectorAll('th,td')).map(c=>(c.textContent||'').replace(/\s+/g,' ').trim().replace(/\|/g,'\\|'));
+    if(!cells.length) return;
+    out.push('| '+cells.join(' | ')+' |');
+    if(ri===0) out.push('| '+cells.map(()=>'---').join(' | ')+' |');
+  });
+  return out.join('\n');
+}
+function inlineMd(node){
+  let out='';
+  node.childNodes.forEach(n=>{
+    if(n.nodeType===3){ out+=n.nodeValue; return; }
+    if(n.nodeType!==1) return;
+    const t=n.tagName.toLowerCase(); const inner=inlineMd(n);
+    if((t==='strong'||t==='b') && inner.trim()) out+='**'+inner.trim()+'**';
+    else if((t==='em'||t==='i') && inner.trim()) out+='*'+inner.trim()+'*';
+    else if(t==='br') out+=' ';
+    else out+=inner;
+  });
+  return out;
+}
+function htmlToBlocks(html){
+  const doc=new DOMParser().parseFromString(html,'text/html'); const blocks=[];
+  const clean=s=>s.replace(/[ \t]*\n[ \t]*/g,' ').replace(/\s{2,}/g,' ').trim();
+  doc.body.childNodes.forEach(node=>{
+    if(node.nodeType!==1) return;
+    const tag=node.tagName.toLowerCase();
+    if(tag==='table'){ const md=tableToMd(node); if(md) blocks.push({tag:'table',txt:md.replace(/\s+/g,' ').trim(),isHeading:false,isTable:true,md}); return; }
+    if(tag==='ul'||tag==='ol'){ Array.from(node.children).forEach(li=>{ if(li.tagName.toLowerCase()!=='li') return; const im=clean(inlineMd(li)); const t=(li.textContent||'').replace(/\s+/g,' ').trim(); if(t) blocks.push({tag:'li',txt:t,isHeading:false,md:'- '+im}); }); return; }
+    const txt=(node.textContent||'').replace(/\s+/g,' ').trim(); if(!txt) return;
+    let im=clean(inlineMd(node)); if(!im) im=txt;
+    // titolo vero SOLO se breve e senza punteggiatura finale (evita i falsi heading di mammoth su paragrafi lunghi)
+    const headTag=/^h([1-6])$/.exec(tag);
+    const isHeading = !!headTag && txt.split(/\s+/).length<=14 && !/[.:;!?]$/.test(txt);
+    let md=im;
+    if(isHeading){ const lvl=Math.min(parseInt(headTag[1],10),3); md='#'.repeat(lvl)+' '+im.replace(/^\*\*|\*\*$/g,''); }
+    else if(tag==='li') md='- '+im;
+    blocks.push({tag,txt,isHeading,md});
+  });
+  return blocks;
+}
+function splitSections(blocks){
+  const secs=[]; let cur=null;
+  const start=(title,letter)=>{ cur={title,isLetter:!!letter,blocks:[]}; secs.push(cur); };
+  start('Apertura',true);
+  blocks.forEach(b=>{
+    let m=null; for(const a of SECTION_ANCHORS){ if(a.re.test(b.txt)&&(b.isHeading||b.txt.length<90)){ m=a; break; } }
+    if(m) start(m.title,m.letter);
+    cur.blocks.push(b);
+  });
+  secs.forEach(s=>{ const j=s.blocks.map(b=>b.txt).join(' ').toLowerCase();
+    if(/\bfrank\b/.test(j)&&/(buona lettura|in bocca al lupo|un abbraccio|car[oa] )/i.test(j)) s.isLetter=true; });
+  return secs.filter(s=>s.blocks.length);
+}
+function chunkSection(sec){
+  const chunks=[]; let buf=[], w=0;
+  const flush=()=>{ if(buf.length){ chunks.push(buf.slice()); buf=[]; w=0; } };
+  sec.blocks.forEach(b=>{ const bw=wc(b.md); if(w+bw>CFG.CHUNK_WORDS&&buf.length) flush(); buf.push(b); w+=bw; });
+  flush(); return chunks.map(bl=>bl.map(b=>b.md).join('\n\n'));
+}
+
+/* ---- SEGMENTAZIONE (v2.1): blocchi a dimensione fissa, in ordine, senza spezzare un blocco.
+   Le lettere si riconoscono dal CONTENUTO (non dai titoli, inaffidabili in questi docx). ---- */
+function buildUnits(blocks){
+  const groups=[]; let buf=[], w=0;
+  const flush=()=>{ if(buf.length){ groups.push(buf.slice()); buf=[]; w=0; } };
+  blocks.forEach(b=>{ const bw=wc(b.md); if(w+bw>CFG.CHUNK_WORDS && buf.length) flush(); buf.push(b); w+=bw; });
+  flush();
+  return groups.map((bl,i)=>{
+    const text=bl.map(b=>b.md).join('\n\n');
+    const firstBlock=bl.find(b=>!b.isTable)||bl[0];
+    const firstLine=(firstBlock.txt||'').trim();
+    const low=text.toLowerCase();
+    const isOpening = i===0 && /^car[oa]\s+[a-zàèéìòù']+/i.test(firstLine);
+    const isClosing = /\bfrank\b/i.test(low) && /(in bocca al lupo|buona lettura e buono studio|un abbraccio|un caro saluto|a presto)/i.test(low);
+    const isLetter = isOpening || isClosing;
+    let title;
+    if(isOpening) title='Lettera iniziale';
+    else if(isClosing) title='Lettera conclusiva';
+    else {
+      const sec=firstLine.match(/^(dove sei oggi|panoramica[^.]*|fase\s*[1-4][^.]*|posizionamento[^.]*|offert[^.]*|sistema commerciale[^.]*|organizzazione[^.]*)/i);
+      const label = sec ? sec[1] : firstLine.slice(0,44)+(firstLine.length>44?'…':'');
+      title='Blocco '+(i+1)+' · '+label;
+    }
+    return {title,isLetter,chunks:[{orig:text,revised:'',signals:[],hunks:[],done:false}]};
+  });
+}
+
+/* ============================ API ============================ */
+async function callAnthropic(sectionText,isLetter,safe){
+  const apiKey=$('#apiKey').value.trim(); const model=$('#modelSel').value;
+  const words=wc(sectionText);
+  const maxTok=Math.min(CFG.MAX_TOKENS_CAP, Math.max(4096, words*4 + 1500));
+  let dyn='';
+  if(isLetter) dyn+="\n[QUESTA E' UNA LETTERA FIRMATA FRANK: NON depersonalizzare, mantieni la prima persona singolare.]";
+  dyn+= S.opts.judg==='spinto'
+    ? "\n[GIUDIZIO: GRIPPO-STYLE. Asciuga con decisione, sostituisci il lessico impreciso, ammorbidisci gli imperativi advisory. Intervieni dove Grippo interverrebbe, non solo sui refusi.]"
+    : "\n[GIUDIZIO: CONSERVATIVO. Tocca il minimo indispensabile; nel dubbio lascia com'e'.]";
+  dyn+= S.opts.rhythm==='conservativo' ? "\n[FUSIONE FRASI: conservativa.]" : "\n[FUSIONE FRASI: scorrevole.]";
+  if(S.opts.angli==='on') dyn+="\n[ANTI-ANGLICISMO SEVERO ON: traduci anche i prestiti inglesi evitabili (implementare, ottimizzare, framework, value proposition, customer journey, engagement, awareness).]";
+  const dens=S.opts.dens||'alta';
+  if(dens==='off') dyn+="\n[NON emettere segnalazioni grafiche: fai solo la revisione del testo.]";
+  else{
+    const quanti = dens==='alta'
+      ? "In QUESTO blocco individua da 1 a 3 punti-grafica (sii generoso): in un report intero le segnalazioni devono essere 40-50."
+      : "In QUESTO blocco individua circa 1 punto-grafica, solo dove l'aiuto al cliente e' evidente.";
+    dyn+="\n[VISUAL PLANNER ATTIVO — CRITERIO GUIDA: una grafica serve a SEMPLIFICARE un concetto e farlo arrivare meglio al CLIENTE. "+quanti+" Cerca i punti dove una slide (un elenco di punti, uno schema, un confronto, dei numeri/obiettivi, una scala d'offerta, un concetto-chiave) renderebbe il contenuto piu' chiaro, sintetico e memorabile per il cliente rispetto al solo testo. Per ognuno emetti una riga '- GRAFICA: <concetto> ; ANCORA: \"<frase esatta di questo blocco>\" ; FASE: <fase>'. NON scrivere i dati o il layout (li decideremo dopo): qui conta solo TROVARE i punti e ancorarli. Emetti SEMPRE il blocco ===SEGNALAZIONI=== se hai trovato almeno un punto.]";
+  }
+  // modalità normale: system come blocchi con prompt caching. modalità safe: system come stringa unica, no cache.
+  const system = safe ? (RULES_PROMPT+'\n\n'+FEWSHOT)
+    : [ {type:'text',text:RULES_PROMPT,cache_control:{type:'ephemeral'}}, {type:'text',text:FEWSHOT,cache_control:{type:'ephemeral'}} ];
+  const body={ model, max_tokens:maxTok, system,
+    messages:[{role:'user',content:'Revisiona questa sezione seguendo le regole.'+dyn+'\n\n--- SEZIONE ---\n'+sectionText}] };
+  const res=await fetch('https://api.anthropic.com/v1/messages',{ method:'POST',
+    headers:{ 'content-type':'application/json','x-api-key':apiKey,'anthropic-version':CFG.API_VERSION,'anthropic-dangerous-direct-browser-access':'true' },
+    body:JSON.stringify(body) });
+  if(!res.ok){ const t=await res.text(); const err=new Error('HTTP '+res.status+' — '+t.slice(0,300)); err.status=res.status; const ra=res.headers.get('retry-after'); if(ra){ const n=parseFloat(ra); if(!isNaN(n)) err.retryAfter=n; } err.overloaded=/overloaded/i.test(t); throw err; }
+  const data=await res.json();
+  const text=(data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('\n');
+  const types=(data.content||[]).map(b=>b.type).join(',')||'(nessun blocco)';
+  return {text, usage:data.usage||{}, stopReason:data.stop_reason||'?', types, maxTok};
+}
+function priceFor(model){
+  if(PRICING[model]) return PRICING[model];
+  const m=model||'';
+  if(/sonnet-4-5/.test(m)) return PRICING['claude-sonnet-4-5'];
+  if(/sonnet-5/.test(m)) return PRICING['claude-sonnet-5'];
+  if(/opus-4-8/.test(m)) return PRICING['claude-opus-4-8'];
+  if(/sonnet-4-6/.test(m)) return {in:3,out:15,cacheWrite:3.75,cacheRead:0.30,label:'Sonnet 4.6'};
+  if(/haiku-4-5/.test(m)) return {in:1,out:5,cacheWrite:1.25,cacheRead:0.10,label:'Haiku 4.5'};
+  if(/opus/.test(m)) return PRICING['claude-opus-4-8'];
+  return {in:3,out:15,cacheWrite:3.75,cacheRead:0.30,label:(m||'?')+' (prezzo stimato)'};
+}
+function costFromUsage(u,model){
+  const p=priceFor(model);
+  const inp=u.input_tokens||0, out=u.output_tokens||0, cw=u.cache_creation_input_tokens||0, cr=u.cache_read_input_tokens||0;
+  const usd=(inp*p.in + out*p.out + cw*p.cacheWrite + cr*p.cacheRead)/1e6;
+  const saved=(cr*(p.in-p.cacheRead))/1e6;
+  return {inp,out,cw,cr,usd,saved};
+}
+
+function parseOutput(raw){
+  let cleaned=raw;
+  META_PATTERNS.concat([META_PROCESS]).forEach(re=> cleaned=cleaned.replace(re,''));
+  const idx=cleaned.indexOf('===SEGNALAZIONI===');
+  let revised=cleaned, sigBlock='';
+  if(idx>=0){ revised=cleaned.slice(0,idx); sigBlock=cleaned.slice(idx+18); }
+  revised=revised.replace(/\n{3,}/g,'\n\n').trim();
+  const signals=[];
+  sigBlock.split('\n').forEach(line=>{
+    if(!/^\s*[-*]\s/.test(line) || !/ANCORA\s*:/i.test(line)) return;
+    const get=k=>{ const r=line.match(new RegExp(k+'\\s*:\\s*([^;]*)','i')); return r?r[1].trim().replace(/^"|"$/g,''):''; };
+    const idea=get('GRAFICA')||get('IDEA');
+    signals.push({idea:idea, layout:get('LAYOUT'), tipo:get('TIPO'), fase:get('FASE'), ancora:get('ANCORA'), titolo:get('TITOLO')||idea, sottotitolo:get('SOTTOTITOLO'), elementi:get('ELEMENTI'), dati:get('DATI'), note:get('NOTE')});
+  });
+  return {revised, signals};
+}
+
+/* ============================ DIFF ============================ */
+function lcsOps(a,b){
+  const n=a.length,m=b.length; const dp=Array.from({length:n+1},()=>new Int32Array(m+1));
+  for(let i=n-1;i>=0;i--)for(let j=m-1;j>=0;j--) dp[i][j]= a[i]===b[j]?dp[i+1][j+1]+1:Math.max(dp[i+1][j],dp[i][j+1]);
+  const ops=[]; let i=0,j=0;
+  while(i<n&&j<m){ if(a[i]===b[j]){ops.push({t:'eq',v:a[i]});i++;j++;} else if(dp[i+1][j]>=dp[i][j+1]){ops.push({t:'del',v:a[i]});i++;} else {ops.push({t:'ins',v:b[j]});j++;} }
+  while(i<n) ops.push({t:'del',v:a[i++]}); while(j<m) ops.push({t:'ins',v:b[j++]});
+  return ops;
+}
+const splitParas = t => String(t).split(/\n{2,}/).map(s=>s.trim()).filter(Boolean);
+const splitWords = t => String(t).split(/(\s+)/).filter(x=>x.length);
+function wordOps(o,n){ return lcsOps(splitWords(o),splitWords(n)); }
+function classify(o,n){
+  const O=o.trim(), N=n.trim();
+  if(!N&&O) return {kind:'cut',label:'taglio'};
+  const uni=s=>s.toLowerCase().replace(/[’`]/g,"'");
+  const oL=uni(O), nL=uni(N);
+  // meccaniche auto (deterministiche)
+  if(/pre[-\s]?qualific/i.test(O)&&/prequalific/i.test(N)) return {kind:'auto',label:'prequalifica'};
+  if(/up[-\s]selling/i.test(O)&&/upselling/i.test(N)) return {kind:'auto',label:'upselling'};
+  if(/mail/i.test(O)&&/un'email/i.test(nL)) return {kind:'auto',label:"un'email"};
+  const norm=s=>uni(s).replace(/[.,:;!?"'-]/g,'').replace(/\s+/g,' ').trim();
+  if(norm(O)===norm(N)) return {kind:'mech',label:'punteggiatura'};
+  if(/^[aeo]$/i.test(O)&&/^(ad|ed|od)$/i.test(N)) return {kind:'auto',label:'eufonica'};
+  return {kind:'judg',label:'giudizio'};
+}
+function mkHunk(id,type,o,n,ops){
+  let c; if(type==='CUT') c={kind:'cut',label:'taglio'};
+  else if(type==='ADD') c={kind:'judg',label:'aggiunta'}; else c=classify(o,n);
+  return {id,type,o,n,ops,kind:c.kind,label:c.label,accepted:(c.kind==='mech'||c.kind==='auto')};
+}
+function buildHunks(orig,revised){
+  const A=splitParas(orig), B=splitParas(revised); const pops=lcsOps(A,B);
+  const hunks=[]; let hid=0, k=0;
+  while(k<pops.length){
+    if(pops[k].t==='eq'){ k++; continue; }
+    const dels=[],inss=[];
+    while(k<pops.length&&pops[k].t!=='eq'){ if(pops[k].t==='del')dels.push(pops[k].v); else inss.push(pops[k].v); k++; }
+    if(dels.length&&!inss.length) hunks.push(mkHunk(hid++,'CUT',dels.join('\n\n'),'',wordOps(dels.join(' '),'')));
+    else if(!dels.length&&inss.length) hunks.push(mkHunk(hid++,'ADD','',inss.join('\n\n'),wordOps('',inss.join(' '))));
+    else if(dels.length===inss.length){ for(let x=0;x<dels.length;x++){ if(dels[x]===inss[x])continue; hunks.push(mkHunk(hid++,'REPL',dels[x],inss[x],wordOps(dels[x],inss[x]))); } }
+    else hunks.push(mkHunk(hid++,'REPL',dels.join('\n\n'),inss.join('\n\n'),wordOps(dels.join(' '),inss.join(' '))));
+  }
+  return hunks;
+}
+
+/* ============================ TIMER & COST UI ============================ */
+function startTimer(){ S.startTime=Date.now(); S.timerId=setInterval(()=>{ S.elapsed=Date.now()-S.startTime; $('#tTimer').textContent=fmtTime(S.elapsed); $('#mTime').textContent=fmtTime(S.elapsed); },500); }
+function stopTimer(){ if(S.timerId) clearInterval(S.timerId); S.timerId=0; S.elapsed=Date.now()-S.startTime; $('#tTimer').textContent=fmtTime(S.elapsed); $('#mTime').textContent=fmtTime(S.elapsed); }
+function updateCostUI(){
+  $('#tCost').textContent=fmtUsd(S.cost.usd); $('#mCost').textContent=fmtUsd(S.cost.usd);
+  $('#mCostEur').textContent=fmtEur(S.cost.usd); $('#mSaved').textContent=fmtUsd(S.cost.saved);
+}
+
+/* ============================ PIPELINE ============================ */
+function buildStatusList(secs){
+  const box=$('#statlist'); box.innerHTML='';
+  secs.forEach((s,i)=>{
+    const r=document.createElement('div'); r.className='strow wait'; r.id='st-'+i;
+    r.innerHTML=`<span class="dot"></span><span class="nm">${esc(s.title)}${s.isLetter?'<span class="lt">lettera</span>':''}</span><span class="st">in attesa</span>`;
+    box.appendChild(r);
+  });
+}
+function setStatus(i,cls,txt){ const r=$('#st-'+i); if(!r) return; r.className='strow '+cls; r.querySelector('.st').textContent=txt; }
+
+async function callAnthropicRetry(text,isLetter,safe){
+  const RETRY_STATUS=[429,500,502,503,504,529], MAX=5;
+  let lastErr;
+  for(let attempt=0; attempt<MAX; attempt++){
+    try{ return await callAnthropic(text,isLetter,safe); }
+    catch(e){
+      lastErr=e; const msg=e.message||'';
+      const net=/failed to fetch|networkerror|load failed|network request failed|timeout/i.test(msg);
+      let status=e.status; if(!status){ const mm=msg.match(/HTTP (\d+)/); if(mm) status=parseInt(mm[1],10); }
+      const overloaded = e.overloaded || /overloaded/i.test(msg);
+      const transient = net || overloaded || (status && RETRY_STATUS.indexOf(status)>=0);
+      if(!transient) throw e;                       // 400/401/403 ecc: errore reale, non insistere
+      if(attempt===MAX-1) break;
+      // attesa: Retry-After se fornito dall'API, altrimenti backoff esponenziale + jitter
+      let waitMs = (e.retryAfter && e.retryAfter>0) ? e.retryAfter*1000 : Math.min(900*Math.pow(2,attempt), 16000);
+      waitMs += Math.floor(Math.random()*400);
+      log('  \u23f3 '+(status||'rete')+(overloaded?' (overloaded)':'')+' \u2014 ritento tra '+(waitMs/1000).toFixed(1)+'s (tentativo '+(attempt+2)+'/'+MAX+')','w');
+      await new Promise(r=>setTimeout(r, waitMs));
+    }
+  }
+  throw lastErr;
+}
+async function processBlock(i){
+  const unit=S.sections[i], chunk=unit.chunks[0];
+  setStatus(i,'run','in corso');
+  const pre=stripMeta(chunk.orig);
+  let out;
+  try{
+    out=await callAnthropicRetry(pre.text,unit.isLetter,false);
+    if(!out.text || wc(out.text)<3){
+      log('  ↻ "'+unit.title+'": 1° tentativo vuoto (stop='+out.stopReason+'). Ritento in modalità semplice…','w');
+      out=await callAnthropicRetry(pre.text,unit.isLetter,true);
+    }
+  }catch(e){
+    // errore definitivo su QUESTO blocco: non fermare gli altri. Tieni l'originale, marca per il retry.
+    chunk.revised=chunk.orig; chunk.hunks=[]; chunk.signals=[]; chunk.done=false; chunk.failed=true;
+    setStatus(i,'warn','errore — da riprovare');
+    log('ERRORE "'+unit.title+'": '+e.message+' — proseguo; potrai rigenerarlo con "Riprova blocchi falliti".','e');
+    return false;
+  }
+  const c=costFromUsage(out.usage,$('#modelSel').value);
+  S.cost.usd+=c.usd; S.cost.saved+=c.saved; S.cost.inp+=c.inp; S.cost.out+=c.out; S.cost.cw+=c.cw; S.cost.cr+=c.cr; updateCostUI();
+  const parsed=parseOutput(out.text);
+  if(!parsed.revised || wc(parsed.revised)<3){
+    chunk.revised=chunk.orig; chunk.signals=parsed.signals||[]; chunk.hunks=[]; chunk.done=true; chunk.noResp=true; chunk.failed=false;
+    setStatus(i,'warn','nessuna risposta — tenuto originale');
+    log('  ⚠ "'+unit.title+'": risposta vuota. stop='+out.stopReason+' · tenuto l\'originale.','w');
+    return true;
+  }
+  const det=deterministicNormalize(parsed.revised, pre.text);
+  const detN=Object.values(det.hits).reduce((a,b)=>a+b,0);
+  if(detN) log('  ['+unit.title+'] layer deterministico: '+detN+' auto ('+Object.keys(det.hits).join(', ')+')','v21');
+  chunk.revised=det.text; chunk.signals=parsed.signals; chunk.hunks=buildHunks(pre.text, det.text); chunk.done=true; chunk.failed=false;
+  const wo=wc(pre.text), wn=wc(chunk.revised);
+  if(wo>=CFG.MIN_WORDS_GUARD && (wo-wn)/wo>CFG.LEN_GUARD){
+    setStatus(i,'warn','da guardare (−'+Math.round((wo-wn)/wo*100)+'%)');
+  } else setStatus(i,'done',chunk.hunks.length+' modifiche');
+  log('  ✓ '+unit.title+' — '+chunk.hunks.length+' modifiche'+(parsed.signals.length?', '+parsed.signals.length+' segnalazioni':''));
+  return true;
+}
+function updateRetryBar(){
+  const failed=S.sections.filter(s=>s.chunks[0].failed).length;
+  const bar=$('#retryBar');
+  if(failed){ bar.classList.remove('hidden'); $('#retryInfo').textContent=failed+' blocchi in errore da rigenerare.'; }
+  else bar.classList.add('hidden');
+}
+async function runReview(){
+  if(S.running) return; S.running=true;
+  showTab('run'); $('#tabRun').disabled=false; $('#log').innerHTML=''; $('#retryBar').classList.add('hidden');
+  S.cost={usd:0,saved:0,inp:0,out:0,cw:0,cr:0}; updateCostUI();
+  $('#btnRun').disabled=true; startTimer();
+  try{
+    const units=buildUnits(htmlToBlocks(S.rawHtml));
+    S.sections=units; buildStatusList(units);
+    log('Blocchi da revisionare: '+units.length,'v21');
+    const total=units.length; let done=0; $('#mProg').textContent='0 / '+total;
+    for(let i=0;i<units.length;i++){ await processBlock(i); done++; $('#mProg').textContent=done+' / '+total; }
+    stopTimer();
+    const failed=S.sections.filter(s=>s.chunks[0].failed).length;
+    if(failed) log(failed+' blocchi in errore (rete). Premi "Riprova blocchi falliti" per rigenerarli.','w');
+    log('Completato in '+fmtTime(S.elapsed)+' · costo '+fmtUsd(S.cost.usd)+' ('+fmtEur(S.cost.usd)+')','v21');
+    updateRetryBar();
+    renderReview(); $('#tabReview').disabled=false; if(!failed) showTab('review'); autoArchive();
+  }catch(e){ stopTimer(); log('Interrotto: '+e.message,'e'); }
+  $('#btnRun').disabled=false; S.running=false;
+}
+async function retryFailed(){
+  if(S.running) return; S.running=true; $('#btnRetry').disabled=true; startTimer();
+  const idxs=S.sections.map((s,i)=>i).filter(i=>S.sections[i].chunks[0].failed);
+  log('↻ Riprovo '+idxs.length+' blocchi falliti…','v21');
+  for(const i of idxs){ await processBlock(i); }
+  stopTimer();
+  const still=S.sections.filter(s=>s.chunks[0].failed).length;
+  log(still? (still+' blocchi ancora in errore. Puoi riprovare di nuovo.') : '✓ Tutti i blocchi recuperati.', still?'w':'v21');
+  updateRetryBar(); renderReview(); autoArchive();
+  $('#btnRetry').disabled=false; S.running=false;
+}
+
+/* ============================ RENDER REVIEW ============================ */
+function allHunks(){ const a=[]; S.sections.forEach((s,si)=>s.chunks.forEach((c,ci)=>c.hunks.forEach(h=>a.push({h,si,ci})))); return a; }
+function renderKpis(){
+  const hs=allHunks().map(x=>x.h);
+  const auto=hs.filter(h=>h.kind==='auto'||h.kind==='mech').length;
+  const k=[['Modifiche',hs.length],['Auto/meccaniche',auto],['Di giudizio',hs.filter(h=>h.kind==='judg').length],['Tagli',hs.filter(h=>h.kind==='cut').length],['Accettate',hs.filter(h=>h.accepted).length],['Segnalazioni',S.sections.reduce((n,s)=>n+s.chunks.reduce((m,c)=>m+c.signals.length,0),0)]];
+  $('#kpis').innerHTML=k.map(x=>`<div class="kpi"><div class="n">${x[1]}</div><div class="l">${x[0]}</div></div>`).join('');
+}
+function diffHtml(ops){ return ops.map(o=> o.t==='eq'?esc(o.v): o.t==='del'?'<del>'+esc(o.v)+'</del>':'<ins>'+esc(o.v)+'</ins>').join(''); }
+function hunkVisible(h){ if(S.filter==='all') return true; if(S.filter==='judg') return h.kind==='judg'||h.kind==='cut'; if(S.filter==='pending') return !h.accepted; return true; }
+function renderReview(){
+  renderKpis();
+  const wrap=$('#sections'); wrap.innerHTML='';
+  S.sections.forEach((sec,si)=>{
+    const nH=sec.chunks.reduce((n,c)=>n+c.hunks.length,0);
+    const vis=[]; sec.chunks.forEach((c,ci)=>c.hunks.forEach(h=>{ if(hunkVisible(h)) vis.push({h,ci}); }));
+    const el=document.createElement('div'); el.className='sec'+(vis.length&&S.filter!=='all'?' open':'');
+    el.innerHTML=`<div class="head"><span class="chev">▸</span>
+      <span class="name">${esc(sec.title)}${sec.isLetter?'<span class="letter">lettera · voce Frank protetta</span>':''}</span>
+      <span class="cnt">${vis.length}${S.filter!=='all'?'/'+nH:''} modifiche</span></div><div class="body"></div>`;
+    const body=el.querySelector('.body');
+    if(!vis.length) body.innerHTML='<div class="empty">Nessuna modifica '+(S.filter!=='all'?'per questo filtro':'in questa sezione')+'.</div>';
+    vis.forEach(({h,ci})=>{
+      const hd=document.createElement('div'); hd.className='hunk k-'+h.kind+(h.accepted?'':' rejected');
+      hd.dataset.si=si; hd.dataset.ci=ci; hd.dataset.hid=h.id;
+      const tagClass=h.kind, tagTxt=h.kind==='auto'?'auto':h.kind==='mech'?'meccanica':h.kind==='cut'?'taglio':'giudizio';
+      hd.innerHTML=`<div class="meta">
+          <span class="tag ${tagClass}">${tagTxt}</span><span class="cat">${esc(h.label)}</span>
+          <span class="acts"><button class="acc${h.accepted?' on acc':''}">Accetta</button><button class="rej${!h.accepted?' on rej':''}">Rifiuta</button></span></div>
+        <div class="diff">${diffHtml(h.ops)}</div>`;
+      hd.querySelector('.acc').onclick=()=>setHunk(si,ci,h.id,true);
+      hd.querySelector('.rej').onclick=()=>setHunk(si,ci,h.id,false);
+      body.appendChild(hd);
+    });
+    el.querySelector('.head').onclick=()=>el.classList.toggle('open');
+    wrap.appendChild(el);
+  });
+  renderSignals(); renderBanners();
+}
+function setHunk(si,ci,hid,acc){
+  const h=S.sections[si].chunks[ci].hunks.find(x=>x.id===hid); h.accepted=acc;
+  const hd=document.querySelector(`.hunk[data-si="${si}"][data-ci="${ci}"][data-hid="${hid}"]`);
+  if(hd){ hd.classList.toggle('rejected',!acc);
+    const a=hd.querySelector('.acc'), r=hd.querySelector('.rej');
+    a.classList.toggle('on',acc); a.classList.toggle('acc',acc); r.classList.toggle('on',!acc); r.classList.toggle('rej',!acc); }
+  renderKpis();
+  if(S.filter==='pending') renderReview();
+}
+function renderSignals(){
+  const box=$('#signals'); box.innerHTML='';
+  const sigs=collectSignals();
+  if(!sigs.length){ box.innerHTML='<div class="empty">Nessuna grafica segnalata.</div>'; return; }
+  sigs.forEach(s=>{ if(s.gen===undefined) s.gen=true; });
+  const bar=document.createElement('div'); bar.className='sigbar';
+  bar.innerHTML='<span class="cnt"></span><span class="sp"></span><button class="btn ghost sm" data-a="all">Seleziona tutte</button><button class="btn ghost sm" data-a="none">Deseleziona tutte</button>';
+  const upd=()=>{ bar.querySelector('.cnt').textContent=sigs.filter(s=>s.gen).length+' / '+sigs.length+' grafiche selezionate'; };
+  box.appendChild(bar);
+  sigs.forEach(s=>{
+    const el=document.createElement('label'); el.className='signal'+(s.gen?'':' off');
+    el.innerHTML=`<input type="checkbox" ${s.gen?'checked':''}>
+      <div class="sinfo">
+        <div class="sh"><span class="type">${esc(s.fase||'grafica')}</span></div>
+        <div class="ttl">${esc(s.titolo||s.idea||'(grafica)')}</div>
+        ${s.ancora?`<div class="ref">↳ dove: "${esc(s.ancora)}"</div>`:''}
+      </div>`;
+    const cb=el.querySelector('input');
+    cb.onchange=()=>{ s.gen=cb.checked; el.classList.toggle('off',!s.gen); upd(); };
+    box.appendChild(el);
+  });
+  bar.querySelector('[data-a="all"]').onclick=(e)=>{ e.preventDefault(); sigs.forEach(s=>s.gen=true); renderSignals(); };
+  bar.querySelector('[data-a="none"]').onclick=(e)=>{ e.preventDefault(); sigs.forEach(s=>s.gen=false); renderSignals(); };
+  upd();
+}
+function renderBanners(){
+  const b=$('#banners'); b.innerHTML='';
+  const letters=S.sections.filter(s=>s.isLetter).length;
+  if(letters) b.innerHTML=`<div class="banner warn">${letters} lettera/e rilevate: la voce in prima persona di Frank è protetta. Verifica comunque incipit e firma.</div>`;
+}
+
+/* ---- ricomposizione con hunk accettati ---- */
+function assembleSection(sec){
+  return sec.chunks.map(c=>{
+    const A=splitParas(c.orig), B=splitParas(c.revised); const pops=lcsOps(A,B); const H=c.hunks; let hi=0; const out=[]; let k=0;
+    while(k<pops.length){
+      if(pops[k].t==='eq'){ out.push(pops[k].v); k++; continue; }
+      const dels=[],inss=[];
+      while(k<pops.length&&pops[k].t!=='eq'){ if(pops[k].t==='del')dels.push(pops[k].v); else inss.push(pops[k].v); k++; }
+      if(dels.length&&!inss.length){ const h=H[hi++]; out.push(h&&!h.accepted?h.o:''); }
+      else if(!dels.length&&inss.length){ const h=H[hi++]; out.push(h&&h.accepted?h.n:''); }
+      else if(dels.length===inss.length){ for(let x=0;x<dels.length;x++){ if(dels[x]===inss[x]){out.push(dels[x]);continue;} const h=H[hi++]; out.push(h&&h.accepted?h.n:dels[x]); } }
+      else { const h=H[hi++]; out.push(h&&h.accepted?h.n:dels.join('\n\n')); }
+    }
+    return out.filter(x=>x!=='').join('\n\n');
+  }).join('\n\n');
+}
+function assembleDoc(){ return S.sections.map(assembleSection).join('\n\n'); }
+
+/* ============================ EXPORT ============================ */
+function dl(name,content,mime){ const b=new Blob([content],{type:mime}); const u=URL.createObjectURL(b); const a=document.createElement('a'); a.href=u; a.download=name; a.click(); URL.revokeObjectURL(u); }
+function baseName(){ return (S.fileName||'report').replace(/\.docx$/i,'').replace(/[^\w\-]+/g,'_'); }
+function exportMd(){ dl(baseName()+'_revisionato.md',assembleDoc(),'text/markdown'); }
+function exportDoc(){
+  const html='<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"></head><body>'+
+    assembleDoc().split(/\n{2,}/).map(p=>'<p>'+esc(p).replace(/\n/g,'<br>')+'</p>').join('')+'</body></html>';
+  dl(baseName()+'_revisionato.doc',html,'application/msword');
+}
+function exportReport(){
+  let r='# Report di revisione — '+baseName()+'\n\n';
+  const hs=allHunks().map(x=>x.h);
+  r+=`Tempo: ${fmtTime(S.elapsed)} · Costo: ${fmtUsd(S.cost.usd)} (${fmtEur(S.cost.usd)})\nModifiche: ${hs.length} · accettate: ${hs.filter(h=>h.accepted).length}\n\n`;
+  S.sections.forEach(sec=>{
+    const list=[]; sec.chunks.forEach(c=>c.hunks.forEach(h=>list.push(h)));
+    if(!list.length) return; r+='## '+sec.title+'\n\n';
+    list.forEach(h=>{ r+=`- [${h.accepted?'x':' '}] (${h.kind}/${h.label}) `+(h.type==='CUT'?`TAGLIO: "${h.o.slice(0,120)}"`:h.type==='ADD'?`AGGIUNTA: "${h.n.slice(0,120)}"`:`"${h.o.slice(0,90)}" → "${h.n.slice(0,90)}"`)+'\n'; });
+    r+='\n';
+  });
+  const sig=[]; S.sections.forEach(s=>s.chunks.forEach(c=>c.signals.forEach(x=>sig.push(Object.assign({s:s.title},x)))));
+  if(sig.length){ r+='## Segnalazioni tabelle/grafici\n\n'; sig.forEach(x=>{ r+=`- [${x.tipo}] ${x.s} — ${x.titolo||''} · dati: ${x.dati||''}${x.ancora?` · dove: "${x.ancora}"`:''}\n`; }); }
+  dl(baseName()+'_revisione_note.md',r,'text/markdown');
+}
+
+/* ============================ ARCHIVIO (IndexedDB) ============================ */
+const DB_NAME='revisore_grippo', STORE='reports';
+function idb(){ return new Promise((res,rej)=>{ const r=indexedDB.open(DB_NAME,1);
+  r.onupgradeneeded=()=>{ const db=r.result; if(!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE,{keyPath:'id'}); };
+  r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }); }
+function dbPut(rec){ return idb().then(db=>new Promise((res,rej)=>{ const tx=db.transaction(STORE,'readwrite'); tx.objectStore(STORE).put(rec); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error); })); }
+function dbAll(){ return idb().then(db=>new Promise((res,rej)=>{ const rq=db.transaction(STORE,'readonly').objectStore(STORE).getAll(); rq.onsuccess=()=>res(rq.result||[]); rq.onerror=()=>rej(rq.error); })); }
+function dbGet(id){ return idb().then(db=>new Promise((res,rej)=>{ const rq=db.transaction(STORE,'readonly').objectStore(STORE).get(id); rq.onsuccess=()=>res(rq.result); rq.onerror=()=>rej(rq.error); })); }
+function dbDel(id){ return idb().then(db=>new Promise((res,rej)=>{ const tx=db.transaction(STORE,'readwrite'); tx.objectStore(STORE).delete(id); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error); })); }
+
+function currentStats(){
+  const hs=allHunks().map(x=>x.h);
+  return { modifiche:hs.length, accettate:hs.filter(h=>h.accepted).length,
+    segnalazioni:S.sections.reduce((n,s)=>n+s.chunks.reduce((m,c)=>m+c.signals.length,0),0),
+    parole:wc(assembleDoc()) };
+}
+async function saveArchive(silent){
+  const rec={ id:'r'+Date.now(), name:S.fileName||'report', date:new Date().toISOString(),
+    model:$('#modelSel').value, opts:S.opts, stats:currentStats(),
+    cost:S.cost, durationMs:S.elapsed, sections:S.sections };
+  try{ await dbPut(rec); if(!silent){ const b=$('#btnArchive'); if(b){ b.textContent='Salvato ✓'; setTimeout(()=>b.textContent='Salva in archivio',1500);} } await renderArchive(); }
+  catch(e){ if(!silent) alert('Errore salvataggio archivio: '+e.message); }
+}
+function autoArchive(){ saveArchive(true); }
+async function renderArchive(){
+  const box=$('#archlist'); if(!box) return;
+  let recs=[]; try{ recs=await dbAll(); }catch(e){ box.innerHTML='<div class="empty">Archivio non disponibile in questo contesto.</div>'; return; }
+  recs.sort((a,b)=> (b.date||'').localeCompare(a.date||''));
+  if(!recs.length){ box.innerHTML='<div class="empty">Nessuna revisione in archivio. Le revisioni completate compaiono qui.</div>'; return; }
+  box.innerHTML='';
+  recs.forEach(rec=>{
+    const d=new Date(rec.date); const dstr=d.toLocaleString('it');
+    const el=document.createElement('div'); el.className='arow';
+    el.innerHTML=`<div class="ai"><div class="an">${esc(rec.name)}</div>
+        <div class="ad">${dstr} · ${esc(priceFor(rec.model).label)} · ${fmtTime(rec.durationMs||0)} · ${fmtUsd((rec.cost||{}).usd||0)}</div>
+        <div class="as">${rec.stats.modifiche} modifiche · ${rec.stats.accettate} accettate · ${rec.stats.segnalazioni} segnalazioni · ${rec.stats.parole} parole</div></div>
+      <div class="aa"><button class="btn ghost sm bo">Riapri</button><button class="btn ghost sm be">Elimina</button></div>`;
+    el.querySelector('.bo').onclick=()=>reopen(rec);
+    el.querySelector('.be').onclick=async()=>{ if(confirm('Eliminare "'+rec.name+'" dall\'archivio?')){ await dbDel(rec.id); renderArchive(); } };
+    box.appendChild(el);
+  });
+}
+function reopen(rec){
+  S.fileName=rec.name; S.opts=rec.opts||S.opts; S.sections=rec.sections||[];
+  S.cost=rec.cost||S.cost; S.elapsed=rec.durationMs||0;
+  updateCostUI(); $('#tTimer').textContent=fmtTime(S.elapsed);
+  renderReview(); $('#tabReview').disabled=false; showTab('review');
+}
+
+/* ============================ UI WIRING ============================ */
+function showTab(name){
+  $$('.tab').forEach(t=>t.classList.toggle('on',t.dataset.tab===name));
+  $$('.pane').forEach(p=>p.classList.toggle('on',p.dataset.pane===name));
+  if(name==='archive') renderArchive();
+}
+function refreshRunBtn(){ $('#btnRun').disabled=!($('#apiKey').value.trim()&&S.rawHtml); }
+async function handleFile(file){
+  if(!file||!/\.docx$/i.test(file.name)){ alert('Serve un file .docx'); return; }
+  S.fileName=file.name;
+  $('#fileInfo').innerHTML='<span class="file-tag">⏳ '+esc(file.name)+' — estrazione…</span>';
+  try{
+    const buf=await file.arrayBuffer();
+    S.srcFmt=await buildSrcFmt(buf);
+    const res=await mammoth.convertToHtml({arrayBuffer:buf});
+    S.rawHtml=res.value;
+    const words=wc(new DOMParser().parseFromString(res.value,'text/html').body.textContent||'');
+    const nt=(S.srcFmt&&S.srcFmt.list)?S.srcFmt.list.filter(x=>x.center&&(x.sz>=30||/century/i.test(x.font))).length:0;
+    $('#fileInfo').innerHTML='<span class="file-tag">✓ '+esc(file.name)+' — '+words.toLocaleString('it')+' parole'+(S.srcFmt&&S.srcFmt.list.length?' · formato letto ('+(S.srcFmt.body.font)+' '+Math.round(S.srcFmt.body.sz/2)+'pt, '+nt+' titoli)':'')+'</span>';
+    const units=buildUnits(htmlToBlocks(S.rawHtml));
+    $('#preScan').textContent='~'+units.length+' blocchi da revisionare'+(units.some(u=>u.isLetter)?' · '+units.filter(u=>u.isLetter).length+' lettera/e protette':'');
+  }catch(e){ $('#fileInfo').innerHTML='<span class="file-tag" style="background:var(--del-bg);color:var(--del)">Errore estrazione: '+esc(e.message)+'</span>'; }
+  refreshRunBtn();
+}
+function wire(){
+  $$('.tab').forEach(t=>{ t.onclick=()=>{ if(!t.disabled) showTab(t.dataset.tab); }; });
+  const setModelChip=()=>{ $('#chipModel').textContent=priceFor($('#modelSel').value.trim()).label; };
+  $('#modelSel').oninput=()=>{ setModelChip(); try{localStorage.setItem('grippo_model',$('#modelSel').value.trim());}catch(e){} };
+  try{ const mm=localStorage.getItem('grippo_model'); if(mm)$('#modelSel').value=mm; }catch(e){}
+  setModelChip();
+  $('#apiKey').oninput=()=>{ try{localStorage.setItem('grippo_key',$('#apiKey').value);}catch(e){} refreshRunBtn(); };
+  try{ const k=localStorage.getItem('grippo_key'); if(k)$('#apiKey').value=k; }catch(e){}
+  const drop=$('#drop'), fi=$('#fileIn');
+  drop.onclick=()=>fi.click(); fi.onchange=e=>handleFile(e.target.files[0]);
+  ['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('hot');}));
+  ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('hot');}));
+  drop.addEventListener('drop',e=>handleFile(e.dataTransfer.files[0]));
+  $$('.seg').forEach(seg=>{ const key=seg.dataset.opt; seg.querySelectorAll('button').forEach(b=>{ b.onclick=()=>{ seg.querySelectorAll('button').forEach(x=>x.classList.remove('on')); b.classList.add('on'); S.opts[key]=b.dataset.v; }; }); });
+  $('#btnRun').onclick=runReview;
+  $$('#filterbar .fbtn').forEach(b=>{ b.onclick=()=>{ $$('#filterbar .fbtn').forEach(x=>x.classList.remove('on')); b.classList.add('on'); S.filter=b.dataset.f; renderReview(); }; });
+  $('#btnAcceptJudg').onclick=()=>{ S.sections.forEach(s=>s.chunks.forEach(c=>c.hunks.forEach(h=>{ if(h.kind==='judg'||h.kind==='cut') h.accepted=true; }))); renderReview(); };
+  $('#btnExpandAll').onclick=()=>$$('#sections .sec').forEach(s=>s.classList.add('open'));
+  $('#btnCollapseAll').onclick=()=>$$('#sections .sec').forEach(s=>s.classList.remove('open'));
+  $('#btnExportMd').onclick=exportMd; $('#btnExportDoc').onclick=exportDoc; $('#btnExportReport').onclick=exportReport;
+  $('#btnArchive').onclick=()=>saveArchive(false);
+  $('#btnRetry').onclick=retryFailed;
+  $('#btnApprove').onclick=approveAndGenerate;
+  $('#btnDlDoc').onclick=()=>{ if(S.graphics) buildDocx(S.graphics); else alert('Prima approva la revisione.'); };
+  $('#btnDlPptx').onclick=()=>{ if(S.graphics) buildPptx(baseName(), S.graphics); else alert('Prima approva la revisione.'); };
+}
+document.addEventListener('DOMContentLoaded',wire);
+
+/* ============================ MODULO GRAFICHE — stile Claude + regole Caputo (DOCX + PPTX) ============================ */
+function loadScript(src){ return new Promise((res,rej)=>{ const s=document.createElement('script'); s.src=src; s.onload=()=>res(true); s.onerror=()=>rej(new Error('load fail')); document.head.appendChild(s); }); }
+async function ensureLibs(){
+  const tryUrls=async(check,urls)=>{ if(check()) return true; for(const u of urls){ try{ await loadScript(u); }catch(e){} if(check()) return true; } return check(); };
+  const okP=await tryUrls(()=>typeof window.PptxGenJS!=='undefined', ['https://cdn.jsdelivr.net/gh/gitbrent/pptxgenjs@3.12.0/dist/pptxgen.bundle.js','https://unpkg.com/pptxgenjs@3.12.0/dist/pptxgen.bundle.js','https://cdnjs.cloudflare.com/ajax/libs/pptxgenjs/3.12.0/pptxgen.bundle.js']);
+  const okH=await tryUrls(()=>typeof window.html2canvas!=='undefined', ['https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js','https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js']);
+  const okD=await tryUrls(()=>typeof window.docx!=='undefined'&&window.docx.Packer, ['https://cdn.jsdelivr.net/npm/docx@7.8.2/build/index.js','https://unpkg.com/docx@7.8.2/build/index.js']);
+  if(!okP) throw new Error("impossibile caricare PptxGenJS (rete o firewall).");
+  if(!okH) throw new Error("impossibile caricare html2canvas (rete o firewall).");
+  if(!okD) throw new Error("impossibile caricare docx (rete o firewall).");
+  return true;
+}
+
+/* ---- helper tabelle markdown ---- */
+function isMdTableBlock(p){ return String(p).split('\n').filter(l=>l.trim().startsWith('|')).length>=2; }
+function mdTableToMatrix(md){ const out=[]; String(md).split('\n').map(l=>l.trim()).filter(l=>l.startsWith('|')).forEach(r=>{ const bare=r.replace(/\|/g,'').trim(); if(/^[\s:-]+$/.test(bare)) return; out.push(r.replace(/^\||\|$/g,'').split('|').map(c=>c.replace(/\\\|/g,'|').trim())); }); return out; }
+function matrixToHtmlTable(m){ if(!m||!m.length) return ''; let h='<table>'; m.forEach((r,ri)=>{ h+='<tr>'+r.map(c=>ri===0?'<th>'+esc(c)+'</th>':'<td>'+esc(c)+'</td>').join('')+'</tr>'; }); return h+'</table>'; }
+function paraToDocHtml(p){ return isMdTableBlock(p)?matrixToHtmlTable(mdTableToMatrix(p)):'<p>'+esc(p).replace(/\n/g,'<br>')+'</p>'; }
+function findAnchorIndex(paras, anchor){ if(!anchor) return -1; const norm=s=>String(s).toLowerCase().replace(/[’]/g,"'").replace(/[*#]/g,'').replace(/\s+/g,' ').trim(); const full=norm(anchor); for(const n of [8,5,4]){ const key=full.split(' ').slice(0,n).join(' '); if(key.length<4) continue; for(let i=0;i<paras.length;i++){ if(norm(paras[i]).includes(key)) return i; } } return -1; }
+function anchorContext(paras, anchor, radius){ const i=findAnchorIndex(paras,anchor); if(i<0) return ''; const a=Math.max(0,i-1), b=Math.min(paras.length-1,i+(radius||2)); return paras.slice(a,b+1).join('\n\n').slice(0,1800); }
+function nearbyTable(paras, anchor){ const i=findAnchorIndex(paras,anchor); if(i<0) return null; for(let j=Math.max(0,i-1); j<=Math.min(paras.length-1,i+3); j++){ if(isMdTableBlock(paras[j])) return mdTableToMatrix(paras[j]); } return null; }
+function parseSignalTable(dati){ if(!dati) return null; if(dati.includes('|')){ const m=mdTableToMatrix(dati); if(m.length>=1 && m[0].length>=2) return m; } const mm=dati.match(/colonn[ae]\s*:?\s*(.+)$/i); if(mm){ const cols=mm[1].split(/[,;]/).map(s=>s.trim()).filter(Boolean); if(cols.length>=2) return [cols]; } return null; }
+function parseSignalChart(dati){ if(!dati) return null; const body=String(dati).replace(/^\s*[^:=0-9\n]{3,60}:\s*/, ''); const pairs=[]; const re=/([\p{L}\d][\p{L}\d'\/&.\-]{0,33}?)[\s:=(]+(\d[\d.,]*)\s*(%?)/gu; let m; while((m=re.exec(body))){ const v=parseFloat(m[2].replace(/\.(?=\d{3}\b)/g,'').replace(',','.')); if(!isNaN(v)) pairs.push({label:m[1].trim(),value:v}); } if(pairs.length<2) return null; return {labels:pairs.map(p=>p.label), values:pairs.map(p=>p.value)}; }
+function classifySignalIsChart(sig){ return /grafico|chart|bars|torta|istogramma|barre/i.test((sig.layout||'')+' '+(sig.tipo||'')); }
+function collectSignals(){ const a=[]; S.sections.forEach(sec=>sec.chunks.forEach(c=>(c.signals||[]).forEach(s=>a.push(s)))); return a; }
+function chunk(arr,n){ const o=[]; for(let i=0;i<arr.length;i+=n) o.push(arr.slice(i,i+n)); return o; }
+
+/* ---- palette accento per Fase ---- */
+const CLAUDE_PALETTE={ panoramic:'#553b54', diagnos:'#396d6b', posizionament:'#70333b', offert:'#a8792a', acquisizion:'#2f6b8f', vendit:'#8f5a2b', organizzazion:'#4a5a44', mercat:'#396d6b', obiettiv:'#553b54', competitor:'#70333b', chiusur:'#70333b' };
+const CLAUDE_ACCENTS=['#553b54','#396d6b','#70333b','#a8792a','#2f6b8f','#4a5a44'];
+function accentFor(fase, idx){ const f=(fase||'').toLowerCase(); for(const k in CLAUDE_PALETTE){ if(f.includes(k)) return CLAUDE_PALETTE[k]; } return CLAUDE_ACCENTS[(idx||0)%CLAUDE_ACCENTS.length]; }
+function hexToRgba(hex,a){ const h=String(hex).replace('#',''); const n=parseInt(h.length===3?h.split('').map(x=>x+x).join(''):h,16); return 'rgba('+((n>>16)&255)+','+((n>>8)&255)+','+(n&255)+','+a+')'; }
+
+/* ---- template slide — regole Caputo: testo NERO, sfondo chiaro, colore solo in bordi/sfondi tenui ---- */
+const SANS="Helvetica,'Segoe UI',Arial,sans-serif", SERIF="Georgia,'Times New Roman',serif", INK="#1a1a1a";
+function slideHtml(o){
+  return '<div style="width:1200px;background:#f8f7f3;font-family:'+SERIF+';padding:48px 56px 40px;box-sizing:border-box;color:'+INK+';">'
+   +(o.eyebrow?'<div style="font-family:'+SANS+';font-size:20px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:'+o.accent+';margin-bottom:10px;">'+esc(o.eyebrow)+'</div>':'')
+   +'<div style="display:flex;align-items:center;gap:15px;">'
+   +'<span style="width:15px;height:15px;border-radius:50%;background:'+o.accent+';display:inline-block;flex:0 0 auto;"></span>'
+   +'<h1 style="margin:0;font-size:42px;line-height:1.08;color:'+INK+';font-weight:700;letter-spacing:-.5px;">'+esc(o.title||'')+'</h1></div>'
+   +(o.subtitle?'<div style="margin:12px 0 0 30px;font-style:italic;color:#3a3a3a;font-size:26px;">'+esc(o.subtitle)+'</div>':'')
+   +'<div style="margin-top:34px;">'+(o.body||'')+'</div>'
+   +'</div>';
+}
+const CARD='background:#fff;border-radius:14px;box-shadow:0 3px 14px rgba(30,20,30,.07);';
+function layoutCards(items,accent){ const c=items.filter(it=>it.t).map((it,i)=>'<div style="flex:1 1 250px;max-width:300px;'+CARD+'padding:22px 20px;border-left:6px solid '+accent+';">'
+    +'<div style="width:38px;height:38px;border-radius:9px;background:'+hexToRgba(accent,.15)+';color:'+INK+';font-family:'+SANS+';font-weight:700;font-size:24px;display:flex;align-items:center;justify-content:center;">'+(i+1)+'</div>'
+    +'<div style="margin-top:14px;font-size:26px;font-weight:700;color:'+INK+';line-height:1.2;">'+esc(it.t)+'</div>'
+    +(it.d?'<div style="margin-top:9px;font-family:'+SANS+';font-size:23px;line-height:1.45;color:#333;">'+esc(it.d)+'</div>':'')+'</div>').join('');
+  return '<div style="display:flex;flex-wrap:wrap;gap:22px;">'+c+'</div>'; }
+function layoutKpi(items,accent){ const c=items.filter(it=>it.t).map(it=>'<div style="flex:1 1 210px;max-width:320px;'+CARD+'padding:26px 22px;border-top:5px solid '+accent+';text-align:center;">'
+    +'<div style="font-size:44px;font-weight:700;color:'+INK+';line-height:1.1;">'+esc(it.t)+'</div>'
+    +(it.d?'<div style="margin-top:10px;font-family:'+SANS+';font-size:23px;color:#333;">'+esc(it.d)+'</div>':'')+'</div>').join('');
+  return '<div style="display:flex;flex-wrap:wrap;gap:22px;justify-content:center;">'+c+'</div>'; }
+function layoutTiers(items,accent){ const c=items.filter(it=>it.t).map(it=>'<div style="flex:1 1 290px;max-width:360px;'+CARD+'overflow:hidden;border-top:5px solid '+accent+';">'
+    +'<div style="background:'+hexToRgba(accent,.13)+';text-align:center;padding:16px;font-size:28px;font-weight:700;font-family:'+SERIF+';color:'+INK+';">'+esc(it.t)+'</div>'
+    +'<div style="padding:26px 20px;text-align:center;">'
+    +(it.v?'<div style="font-size:42px;font-weight:700;color:'+INK+';">'+esc(it.v)+'</div>':'')
+    +(it.d?'<div style="margin-top:12px;font-family:'+SANS+';font-size:23px;line-height:1.4;color:#333;">'+esc(it.d)+'</div>':'')+'</div></div>').join('');
+  return '<div style="display:flex;gap:24px;justify-content:center;flex-wrap:wrap;">'+c+'</div>'; }
+function layoutStatement(head,body,callout,accent){ return '<div style="'+CARD+'border-left:7px solid '+accent+';padding:28px 30px;">'
+    +(head?'<div style="font-size:32px;font-weight:700;color:'+INK+';line-height:1.25;">'+esc(head)+'</div>':'')
+    +(body?'<div style="margin-top:12px;font-family:'+SANS+';font-size:24px;line-height:1.5;color:'+INK+';">'+esc(body)+'</div>':'')+'</div>'
+    +(callout?'<div style="margin-top:22px;background:'+hexToRgba(accent,.12)+';border-left:7px solid '+accent+';border-radius:10px;padding:20px 26px;font-style:italic;font-size:24px;color:'+INK+';">'+esc(callout)+'</div>':''); }
+function layoutTable(m,accent){ if(!m||!m.length) return ''; const rows=m.filter(r=>r&&r.length).map((r,ri)=>'<tr>'+r.map(c=>ri===0
+    ?'<th style="background:'+hexToRgba(accent,.15)+';color:'+INK+';text-align:left;padding:14px 18px;font-family:'+SANS+';font-size:23px;font-weight:700;border-bottom:2px solid '+accent+';">'+esc(c)+'</th>'
+    :'<td style="padding:13px 18px;border-bottom:1px solid #e6e0d6;font-family:'+SANS+';font-size:23px;color:'+INK+';background:'+(ri%2?'#fff':'#faf8f4')+';">'+esc(c)+'</td>').join('')+'</tr>').join('');
+  return '<table style="width:100%;border-collapse:collapse;border-radius:12px;overflow:hidden;box-shadow:0 3px 14px rgba(30,20,30,.07);">'+rows+'</table>'; }
+function layoutBars(labels,values,accent){ const max=Math.max.apply(null,values.concat([1])); const rows=labels.map((l,i)=>{ const w=Math.max(3,Math.round(values[i]/max*100)); return '<div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;"><div style="flex:0 0 200px;text-align:right;font-family:'+SANS+';font-size:24px;color:'+INK+';">'+esc(l)+'</div><div style="flex:1;background:'+hexToRgba(accent,.12)+';border-radius:7px;height:30px;position:relative;"><div style="width:'+w+'%;height:100%;background:'+accent+';border-radius:7px;min-width:3px;"></div></div><div style="flex:0 0 auto;font-family:'+SANS+';font-size:24px;font-weight:700;color:'+INK+';">'+esc(String(values[i]))+'</div></div>'; }).join('');
+  return '<div style="'+CARD+'padding:30px 32px;">'+rows+'</div>'; }
+
+/* ---- icone SVG inline (stroke = accento) ---- */
+const ICON_PATHS={
+  commerciale:'<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>',
+  operativo:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+  strategico:'<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22V3"/>',
+  tempo:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  qualita:'<circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/>',
+  persone:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/>',
+  pacchetto:'<path d="M21 8v13H3V8"/><path d="M1 3h22v5H1z"/><path d="M10 12h4"/>',
+  prezzo:'<path d="M20.59 13.41 12 22l-9-9V3h10l7.59 7.59a2 2 0 0 1 0 2.82z"/><circle cx="7.5" cy="7.5" r="1.5"/>',
+  garanzia:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/>',
+  crescita:'<path d="M23 6l-9.5 9.5-5-5L1 18"/><path d="M17 6h6v6"/>',
+  funnel:'<path d="M22 3H2l8 9.46V19l4 2v-8.54z"/>',
+  obiettivo:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/>',
+  denaro:'<path d="M18 7a6 6 0 1 0 0 10"/><path d="M4 11h9"/><path d="M4 14h8"/>',
+  attenzione:'<path d="M12 2 1 21h22L12 2z"/><path d="M12 9v5"/><path d="M12 17.5v.5"/>',
+  idea:'<path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.3h6c0-1 .4-1.8 1-2.3A7 7 0 0 0 12 2z"/>',
+  documento:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>',
+  calendario:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+  stella:'<path d="M12 2l3 7h7l-5.5 4 2 7L12 17l-6.5 3 2-7L2 9h7z"/>',
+  posizionamento:'<path d="M12 21s-7-6.3-7-11a7 7 0 0 1 14 0c0 4.7-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>',
+  telefono:'<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.6A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/>'
+};
+const ICON_SYN={vendite:'commerciale',vendita:'commerciale',commercio:'commerciale',mercato:'commerciale',operazioni:'operativo',processo:'operativo',ingranaggio:'operativo',strategia:'strategico',cavallo:'strategico',bandiera:'strategico',orologio:'tempo',tempi:'tempo',ore:'tempo',check:'qualita',qualità:'qualita',spunta:'qualita',cliente:'persone',clienti:'persone',team:'persone',pubblico:'persone',target:'obiettivo',prodotto:'pacchetto',servizio:'pacchetto',offerta:'pacchetto',pacco:'pacchetto',prezzi:'prezzo',costo:'prezzo',tariffa:'prezzo',euro:'denaro',soldi:'denaro',fatturato:'denaro',ricavi:'denaro',margine:'denaro',scudo:'garanzia',protezione:'garanzia',bonus:'stella',trend:'crescita',aumento:'crescita',imbuto:'funnel',lead:'funnel',allerta:'attenzione',rischio:'attenzione',problema:'attenzione',lampadina:'idea',soluzione:'idea',documento:'documento',report:'documento',scheda:'documento',data:'calendario',giorni:'calendario',settimana:'calendario',luogo:'posizionamento',posizione:'posizionamento',mappa:'posizionamento',call:'telefono'};
+function iconKey(name){ const n=String(name||'').toLowerCase().trim(); if(ICON_PATHS[n]) return n; if(ICON_SYN[n]) return ICON_SYN[n]; for(const k in ICON_SYN){ if(n.includes(k)) return ICON_SYN[k]; } for(const k in ICON_PATHS){ if(n.includes(k)) return k; } return 'obiettivo'; }
+function iconSvg(name,color,size){ const s=size||38; return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 24 24" fill="none" stroke="'+color+'" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+ICON_PATHS[iconKey(name)]+'</svg>'; }
+function shade(hex,i,n){ const h=String(hex).replace('#',''); const num=parseInt(h,16); let r=(num>>16)&255,g=(num>>8)&255,b=num&255; const t=n>1?(i/(n-1))*0.62:0; r=Math.round(r+(255-r)*t); g=Math.round(g+(255-g)*t); b=Math.round(b+(255-b)*t); return 'rgb('+r+','+g+','+b+')'; }
+
+function layoutIconCards(items,accent){ const c=items.filter(it=>it.t).map(it=>'<div style="flex:1 1 250px;max-width:320px;'+CARD+'padding:24px 22px;">'
+    +'<div style="display:flex;align-items:center;gap:12px;">'+iconSvg(it.icon,accent,40)+'<div style="font-size:26px;font-weight:700;color:'+INK+';line-height:1.15;">'+esc(it.t)+'</div></div>'
+    +(it.d?'<div style="margin-top:12px;font-family:'+SANS+';font-size:23px;line-height:1.45;color:#333;">'+esc(it.d)+'</div>':'')+'</div>').join('');
+  return '<div style="display:flex;flex-wrap:wrap;gap:22px;">'+c+'</div>'; }
+function layoutSteps(items,accent){ const c=items.filter(it=>it.t).map((it,i)=> (i?'<div style="align-self:center;font-size:30px;color:'+hexToRgba(accent,.5)+';padding:0 2px;">›</div>':'')
+    +'<div style="flex:1 1 200px;max-width:280px;'+CARD+'padding:22px 18px;text-align:center;">'
+    +'<div style="width:56px;height:56px;border-radius:50%;background:'+accent+';color:#fff;font-family:'+SANS+';font-weight:700;font-size:24px;display:flex;align-items:center;justify-content:center;margin:0 auto;">'+(i+1)+'</div>'
+    +(it.label?'<div style="margin-top:12px;font-family:'+SANS+';font-size:20px;color:#666;text-transform:uppercase;letter-spacing:.05em;">'+esc(it.label)+'</div>':'')
+    +'<div style="margin-top:8px;font-size:24px;font-weight:700;color:'+INK+';">'+esc(it.t)+'</div>'
+    +(it.d?'<div style="margin-top:8px;font-family:'+SANS+';font-size:20px;line-height:1.4;color:#444;">'+esc(it.d)+'</div>':'')+'</div>').join('');
+  return '<div style="display:flex;align-items:stretch;gap:8px;flex-wrap:wrap;justify-content:center;">'+c+'</div>'; }
+function layoutInfographic(items,accent){ const c=items.filter(it=>it.t).map(it=>'<div style="flex:1 1 200px;max-width:280px;'+CARD+'padding:26px 20px;text-align:center;border-top:4px solid '+accent+';">'
+    +'<div style="display:flex;justify-content:center;">'+iconSvg(it.icon,accent,40)+'</div>'
+    +'<div style="margin-top:12px;font-size:40px;font-weight:700;color:'+INK+';line-height:1;">'+esc(it.t)+'</div>'
+    +(it.d?'<div style="margin-top:9px;font-family:'+SANS+';font-size:22px;color:#333;">'+esc(it.d)+'</div>':'')+'</div>').join('');
+  return '<div style="display:flex;flex-wrap:wrap;gap:22px;justify-content:center;">'+c+'</div>'; }
+function pieArc(cx,cy,R,a0,a1,fill){ const p=(deg)=>{const a=deg*Math.PI/180;return [cx+R*Math.cos(a),cy+R*Math.sin(a)];}; const [x0,y0]=p(a0),[x1,y1]=p(a1); const large=(a1-a0)>180?1:0; return '<path d="M'+cx+' '+cy+' L'+x0.toFixed(1)+' '+y0.toFixed(1)+' A'+R+' '+R+' 0 '+large+' 1 '+x1.toFixed(1)+' '+y1.toFixed(1)+' Z" fill="'+fill+'"/>'; }
+function layoutPie(items,accent){ const data=items.map(it=>({label:it.label||it.t||'', value:Number(it.value!=null?it.value:it.v)})).filter(d=>!isNaN(d.value)&&d.value>0);
+  if(data.length<2) return layoutStatement((items[0]&&(items[0].label||items[0].t))||'', '', '', accent);
+  const tot=data.reduce((a,b)=>a+b.value,0)||1; const cols=data.map((_,i)=>shade(accent,i,data.length)); let ang=-90, paths='';
+  data.forEach((d,i)=>{ const a1=ang+d.value/tot*360; paths+=pieArc(140,140,120,ang,a1,cols[i]); ang=a1; });
+  const svg='<svg width="280" height="280" viewBox="0 0 280 280">'+paths+'<circle cx="140" cy="140" r="66" fill="#f8f7f3"/></svg>';
+  const legend=data.map((d,i)=>'<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;font-family:'+SANS+';font-size:24px;color:'+INK+';"><span style="width:16px;height:16px;border-radius:4px;background:'+cols[i]+';flex:0 0 auto;"></span><span>'+esc(d.label)+' — <b>'+Math.round(d.value/tot*100)+'%</b></span></div>').join('');
+  return '<div style="display:flex;align-items:center;gap:40px;flex-wrap:wrap;justify-content:center;"><div>'+svg+'</div><div style="flex:1 1 240px;max-width:420px;">'+legend+'</div></div>'; }
+
+function footerName(fase){ let n=(S.fileName||'Report').replace(/\.(docx?|pdf)$/i,'').replace(/[_]+/g,' ').trim(); if(n.length>46) n=n.slice(0,46)+'…'; return n+(fase?' · '+fase:''); }
+
+/* ---- specToBody: da spec JSON a UNA slide ---- */
+function specToBody(spec, idx){
+  const accent=accentFor(spec.fase, idx); const L=(spec.layout||'').toLowerCase().trim();
+  const items=Array.isArray(spec.items)?spec.items:[]; let body='';
+  if(L==='cards') body=layoutCards(items.map(x=>({t:x.t||x.title||x.label||'', d:x.d||x.desc||x.text||''})),accent);
+  else if(L==='icons') body=layoutIconCards(items.map(x=>({icon:x.icon||x.i||'', t:x.t||x.title||x.label||'', d:x.d||x.desc||x.text||''})),accent);
+  else if(L==='steps') body=layoutSteps(items.map(x=>({t:x.t||x.title||'', label:x.label||x.l||'', d:x.d||x.desc||''})),accent);
+  else if(L==='infographic') body=layoutInfographic(items.map(x=>({icon:x.icon||x.i||'', t:x.t||x.value||x.v||'', d:x.d||x.label||x.desc||''})),accent);
+  else if(L==='pie') body=layoutPie(items,accent);
+  else if(L==='kpi') body=layoutKpi(items.map(x=>({t:x.t||x.value||x.v||'', d:x.d||x.label||x.desc||''})),accent);
+  else if(L==='tiers') body=layoutTiers(items.map(x=>({t:x.t||x.name||x.title||'', v:x.v||x.value||x.price||'', d:x.d||x.desc||''})),accent);
+  else if(L==='statement'){ const s=spec.statement||{}; body=layoutStatement(s.head||spec.title, s.body||s.text||'', s.callout||'', accent); }
+  else if(L==='bars'){ const labels=items.map(x=>x.label||x.t||''); const values=items.map(x=>Number(x.value!=null?x.value:x.v)); body=(labels.length&&values.every(v=>!isNaN(v)))?layoutBars(labels,values,accent):''; }
+  else if(L==='table'){ const m=[].concat(spec.headers?[spec.headers]:[], spec.rows||[]).filter(r=>r&&r.length); body=layoutTable(m,accent); }
+  if(!body) body=layoutStatement(spec.title, (items.map(x=>x.t||x.label).filter(Boolean).join(' · '))||'', '', accent);
+  return {accent, html:slideHtml({eyebrow:spec.kicker||'', title:spec.title||'', subtitle:spec.subtitle||'', body, accent})};
+}
+/* ---- specToSlides: applica i TETTI Caputo e SPEZZA in più slide ---- */
+function specToSlides(spec, idx){
+  const L=(spec.layout||'').toLowerCase().trim(); const caps={cards:6,icons:6,steps:5,infographic:4,kpi:4,tiers:3,bars:8,pie:6};
+  let groups=[spec];
+  if(Array.isArray(spec.items) && caps[L] && spec.items.length>caps[L]) groups=chunk(spec.items,caps[L]).map(part=>Object.assign({},spec,{items:part}));
+  else if(L==='table' && Array.isArray(spec.rows) && spec.rows.length>7) groups=chunk(spec.rows,7).map(part=>Object.assign({},spec,{rows:part}));
+  const n=groups.length;
+  return groups.map((g,i)=>{ const gg=Object.assign({},g); if(n>1) gg.title=(g.title||'')+' ('+(i+1)+'/'+n+')'; return specToBody(gg,idx); });
+}
+function buildBody(sig, idx){ const accent=accentFor(sig.fase, idx); const el=sig.elementi||sig.dati||''; return {accent, html:slideHtml({title:sig.titolo||'', subtitle:sig.sottotitolo||'', body:layoutStatement(sig.titolo, el||sig.note||'', '', accent), accent, footer:footerName(sig.fase)})}; }
+
+/* ---- generazione dedicata dello spec via API ---- */
+const SLIDE_SPEC_SYS=`Sei un progettista di slide che segue regole rigide di leggibilita' (metodo Caputo). Ricevi un ESTRATTO di un report di consulenza e un'IDEA di grafica. Produci UNA slide che spieghi il concetto a colpo d'occhio.
+Rispondi ESCLUSIVAMENTE con JSON valido, senza testo prima/dopo, senza backtick. Schema:
+{"layout":"cards|icons|steps|infographic|pie|bars|kpi|tiers|statement|table","kicker":"(occhiello breve MAIUSCOLO opz, es. LA FOTOGRAFIA DI OGGI)","title":"...","subtitle":"(opz)","fase":"(es. Diagnosi, Posizionamento, Offerte, Competitor)","items":[...],"statement":{"head":"","body":"","callout":""},"headers":[...],"rows":[[...]]}
+Campi per layout:
+- cards: items=[{"t":"titolo","d":"1 frase"}]. Elenco di punti/criteri/vincoli.
+- icons: items=[{"icon":"parola-chiave","t":"titolo","d":"1 frase"}]. Come cards ma con un'icona per concetto (aree, pilastri, requisiti).
+- steps: items=[{"t":"titolo passo","label":"etichetta breve opz","d":"1 frase"}]. Per processi/sequenze/tempistiche (max 5).
+- infographic: items=[{"icon":"parola-chiave","t":"NUMERO o valore","d":"etichetta"}]. Per statistiche con icona (max 4). Numeri solo se reali.
+- pie: items=[{"label":"voce","value":40}]. USA LA TORTA quando il testo esprime una COMPOSIZIONE o ripartizione di un intero: quote di mercato, mix di fatturato (es. B2C vs B2B), suddivisione di clienti/ricavi/costi in percentuali o parti. Bastano 2+ valori.
+- bars: items=[{"label":"voce","value":240}]. Solo per CONFRONTI di grandezze indipendenti (non parti di uno stesso intero).
+- kpi: items=[{"t":"1,85 mln €","d":"etichetta"}]. Numeri chiave senza icona.
+- tiers: items=[{"t":"Nome","v":"319 €","d":"1 frase"}]. Livelli d'offerta/prezzi.
+- statement: statement={"head":"concetto forte","body":"spiegazione","callout":"eco opz"}. Un'unica idea centrale.
+- table: headers=[...], rows=[[...]]. Solo confronti veri.
+ICONE disponibili (usa questi nomi o sinonimi italiani nel campo "icon"): commerciale, operativo, strategico, tempo, qualita, persone, pacchetto, prezzo, garanzia, crescita, funnel, obiettivo, denaro, attenzione, idea, documento, calendario, stella, posizionamento, telefono.
+REGOLE FERREE (leggibilita' prima di tutto):
+- Contenuti VERI dall'estratto, sintetici: titoli 2-5 parole, descrizioni max ~12 parole. MAI descrivere la struttura ("Colonna 1", "Righe"): scrivi i valori.
+- POCHI concetti per slide: cards/icons max 6, steps max 5, infographic/kpi max 4, tiers max 3, tabella max 6 righe. Tieni solo i piu' importanti (l'app spezza in piu' slide).
+- MAI inventare numeri: niente pie/bars/kpi/infographic numerici se non ci sono dati reali; in quel caso usa cards/icons/statement/steps.
+- Se il testo parla di un COMPETITOR, fai una slide su QUEL competitor soltanto.
+- Scegli il layout piu' chiaro per il concetto: processi->steps, aree/pilastri->icons, COMPOSIZIONI/ripartizioni%->pie, confronti di grandezze indipendenti->bars, numeri chiave->kpi/infographic, un'idea->statement. Quando nel testo c'e' una suddivisione in parti di un totale, PREFERISCI la torta.`;
+async function callJSON(sys,user,maxTok){
+  const apiKey=$('#apiKey').value.trim(), model=$('#modelSel').value;
+  const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':apiKey,'anthropic-version':CFG.API_VERSION,'anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({model,max_tokens:maxTok||900,system:[{type:'text',text:sys,cache_control:{type:'ephemeral'}}],messages:[{role:'user',content:user}]})});
+  if(!res.ok){ const t=await res.text(); throw new Error('HTTP '+res.status+' '+t.slice(0,140)); }
+  const data=await res.json(); const txt=(data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
+  return {txt, usage:data.usage||{}};
+}
+function parseSpecJSON(txt){ let t=String(txt).trim().replace(/```json/gi,'').replace(/```/g,'').trim(); const a=t.indexOf('{'), b=t.lastIndexOf('}'); if(a>=0&&b>a) t=t.slice(a,b+1); try{ const s=JSON.parse(t); return (s&&s.layout)?s:null; }catch(e){ return null; } }
+async function genSlideSpec(sig, ctx){
+  const hint=[sig.idea&&('concetto: '+sig.idea), sig.fase&&('fase: '+sig.fase)].filter(Boolean).join(' ; ');
+  const user='ESTRATTO DEL REPORT (usa questo come fonte dei contenuti):\n"""\n'+String(ctx||sig.dati||sig.idea||sig.titolo||'').replace(/[*#]/g,'')+'\n"""\n\nCONCETTO DA VISUALIZZARE: '+(hint||sig.idea||'(scegli tu il punto piu utile)')+'\n\nProduci il JSON della slide che rende questo concetto chiaro per il cliente.';
+  const r=await callJSON(SLIDE_SPEC_SYS,user,900);
+  if(r.usage){ const c=costFromUsage(r.usage,$('#modelSel').value); S.cost.usd+=c.usd; S.cost.saved+=c.saved; S.cost.inp+=c.inp; S.cost.out+=c.out; S.cost.cw+=c.cw; S.cost.cr+=c.cr; try{updateCostUI();}catch(e){} }
+  return parseSpecJSON(r.txt);
+}
+async function renderSlidePng(html){
+  if(typeof window.html2canvas==='undefined') return null;
+  const host=document.createElement('div'); host.style.cssText='position:fixed;left:-99999px;top:0;width:1200px;z-index:-1;';
+  host.innerHTML=html; document.body.appendChild(host);
+  try{ const canvas=await window.html2canvas(host.firstElementChild,{scale:2,backgroundColor:'#f8f7f3',width:1200,windowWidth:1200,logging:false});
+    return {url:canvas.toDataURL('image/jpeg',0.9), w:canvas.width, h:canvas.height};
+  }catch(e){ return null; } finally{ document.body.removeChild(host); }
+}
+async function generateGraphics(onProg){
+  const paras=splitParas(assembleDoc()); const sigs=collectSignals().filter(s=>s.gen!==false); const items=[];
+  for(let i=0;i<sigs.length;i++){ const sig=sigs[i];
+    let spec=null; try{ spec=await genSlideSpec(sig, anchorContext(paras,sig.ancora,2)); }catch(e){}
+    const bodies = spec? specToSlides(spec,i) : [buildBody(sig,i)];
+    for(const b of bodies){ const r=await renderSlidePng(b.html); items.push({sig, spec, png:r&&r.url, w:r&&r.w, h:r&&r.h, accent:b.accent}); }
+    if(onProg) onProg(i+1,sigs.length,spec,bodies.length);
+  }
+  return items;
+}
+function dataURLtoU8(u){ const b=atob(String(u).split(',')[1]); const a=new Uint8Array(b.length); for(let i=0;i<b.length;i++) a[i]=b.charCodeAt(i); return a; }
+/* ---- DOCX vero (docx-js); immagini max 16 cm = 605 px ---- */
+function safeInsertIndex(paras, i){
+  const isT=k=> k>=0&&k<paras.length&&isMdTableBlock(paras[k]);
+  let j=i;
+  for(let step=0; step<6 && j<paras.length-1; step++){
+    const near = isT(j-2)||isT(j-1)||isT(j)||isT(j+1)||isT(j+2);
+    if(!near) break; j++;
+  }
+  return j;
+}
+/* ---- lettura FORMATTAZIONE reale dal .docx originale (per riprodurla fedelmente) ---- */
+async function inflateRaw(bytes){ const ds=new DecompressionStream('deflate-raw'); const stream=new Blob([bytes]).stream().pipeThrough(ds); return new Uint8Array(await new Response(stream).arrayBuffer()); }
+async function readZipEntry(arrayBuf, name){
+  const u8=new Uint8Array(arrayBuf); const dv=new DataView(arrayBuf); let eocd=-1;
+  for(let i=u8.length-22;i>=0 && i>u8.length-22-65536;i--){ if(u8[i]===0x50&&u8[i+1]===0x4b&&u8[i+2]===0x05&&u8[i+3]===0x06){ eocd=i; break; } }
+  if(eocd<0) throw new Error('zip EOCD');
+  const cdCount=dv.getUint16(eocd+10,true); let p=dv.getUint32(eocd+16,true);
+  for(let n=0;n<cdCount;n++){
+    if(dv.getUint32(p,true)!==0x02014b50) break;
+    const method=dv.getUint16(p+10,true), csize=dv.getUint32(p+20,true);
+    const nlen=dv.getUint16(p+28,true), elen=dv.getUint16(p+30,true), clen=dv.getUint16(p+32,true), lho=dv.getUint32(p+42,true);
+    const fname=new TextDecoder().decode(u8.slice(p+46,p+46+nlen));
+    if(fname===name){ const lnlen=dv.getUint16(lho+26,true), lelen=dv.getUint16(lho+28,true); const ds=lho+30+lnlen+lelen; const data=u8.slice(ds,ds+csize); const raw=method===0?data:await inflateRaw(data); return new TextDecoder('utf-8').decode(raw); }
+    p=p+46+nlen+elen+clen;
+  }
+  return null;
+}
+function parseParaFmt(xml){
+  const paras=xml.match(/<w:p\b[^>]*>[\s\S]*?<\/w:p>/g)||[]; const out=[];
+  paras.forEach(p=>{
+    const text=(p.match(/<w:t[^>]*>([\s\S]*?)<\/w:t>/g)||[]).map(t=>t.replace(/<[^>]+>/g,'')).join('').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&#8217;|&#x2019;/g,'’').trim();
+    if(!text) return;
+    const font=(p.match(/w:(?:ascii|hAnsi)="([^"]+)"/)||[])[1]||'';
+    const sz=parseInt((p.match(/<w:sz w:val="(\d+)"/)||[])[1]||'0',10);
+    const bold=/<w:b\/>|<w:b w:val="(?:1|true|on)"/.test(p);
+    const italic=/<w:i\/>|<w:i w:val="(?:1|true|on)"/.test(p);
+    const center=/<w:jc w:val="center"/.test(p);
+    out.push({text,font,sz,bold,italic,center});
+  });
+  return out;
+}
+function normKey(t,n){ return String(t).toLowerCase().replace(/[’]/g,"'").replace(/[*#]/g,'').replace(/[^a-z0-9à-ù' ]/gi,'').replace(/\s+/g,' ').trim().split(' ').slice(0,n).join(' '); }
+async function buildSrcFmt(arrayBuf){
+  const R={list:[],map:{},body:{font:'Garamond',sz:24}};
+  if(typeof DecompressionStream==='undefined') return R;
+  try{
+    const xml=await readZipEntry(arrayBuf,'word/document.xml'); if(!xml) return R;
+    const list=parseParaFmt(xml); R.list=list;
+    const cnt={}; list.forEach(x=>{ if(x.font&&x.sz&&!x.center&&!x.bold){ const k=x.font+'|'+x.sz; cnt[k]=(cnt[k]||0)+1; } });
+    const top=Object.entries(cnt).sort((a,b)=>b[1]-a[1])[0]; if(top){ const q=top[0].split('|'); R.body={font:q[0],sz:parseInt(q[1],10)}; }
+    list.forEach(x=>{ [7,5,4].forEach(n=>{ const k=normKey(x.text,n); if(k.length>=4 && !R.map[n+'|'+k]) R.map[n+'|'+k]=x; }); });
+  }catch(e){}
+  return R;
+}
+function fmtFor(text){ const R=S.srcFmt; if(!R||!R.map) return null; for(const n of [7,5,4]){ const k=normKey(text,n); const hit=R.map[n+'|'+k]; if(hit) return hit; } return null; }
+
+function mdInlineToRuns(D, text, opts){
+  const {TextRun}=D; const o=opts||{}; const base=r=>Object.assign({font:o.font||'Garamond', size:o.size||24}, o.bold?{bold:true}:{}, o.italics?{italics:true}:{}, r);
+  const runs=[]; const re=/(\*\*([^*]+)\*\*|\*([^*]+)\*)/g; let last=0,m;
+  while((m=re.exec(text))){
+    if(m.index>last) runs.push(new TextRun(base({text:text.slice(last,m.index)})));
+    if(m[2]!=null) runs.push(new TextRun(base({text:m[2],bold:true})));
+    else if(m[3]!=null) runs.push(new TextRun(base({text:m[3],italics:true})));
+    last=re.lastIndex;
+  }
+  if(last<text.length) runs.push(new TextRun(base({text:text.slice(last)})));
+  return runs.length?runs:[new TextRun(base({text}))];
+}
+async function buildDocx(items){
+  const D=window.docx; const {Document,Packer,Paragraph,TextRun,ImageRun,Table,TableRow,TableCell,WidthType,AlignmentType,BorderStyle}=D;
+  const BODYDEF=(S.srcFmt&&S.srcFmt.body)||{font:'Garamond',sz:24};
+  const paras=splitParas(assembleDoc()); const insByIdx={}, leftovers=[];
+  (items||[]).forEach(it=>{ if(!it.png) return; let idx=findAnchorIndex(paras,it.sig.ancora); if(idx>=0) idx=safeInsertIndex(paras,idx); (idx>=0?(insByIdx[idx]=insByIdx[idx]||[]):leftovers).push(it); });
+  const TW=9026; const children=[];
+  const spacer=(tw)=> new Paragraph({children:[new TextRun('')], spacing:{after:tw||120}});
+  const imgPara=(it)=>{ const ar=(it.w&&it.h)?it.w/it.h:(1200/700); const w=605, h=Math.round(w/ar); return new Paragraph({alignment:AlignmentType.CENTER, spacing:{before:340,after:340}, children:[new ImageRun({data:dataURLtoU8(it.png), transformation:{width:w,height:h}})]}); };
+  const mkTable=(m)=>{ const cols=Math.max.apply(null,m.map(r=>r.length))||1; const cw=Math.floor(TW/cols);
+    return new Table({ width:{size:TW,type:WidthType.DXA}, columnWidths:Array(cols).fill(cw),
+      rows:m.map((r,ri)=> new TableRow({children:Array.from({length:cols}).map((_,ci)=> new TableCell({width:{size:cw,type:WidthType.DXA}, shading:ri===0?{fill:'EFEAE2'}:undefined, children:[new Paragraph({children:mdInlineToRuns(D,String(r[ci]!=null?r[ci]:''), {font:BODYDEF.font,size:BODYDEF.sz,bold:ri===0})})]})) })) }); };
+  const mkDivider=()=> new Paragraph({ border:{bottom:{style:BorderStyle.SINGLE,size:12,color:'A0A0A0',space:1}}, spacing:{before:260,after:260}, children:[new TextRun('')] });
+  const mkPara=(line)=>{
+    const clean=line.replace(/^#{1,6}\s+/,'');            // togli marcatore titolo, il formato lo prendo dal sorgente
+    const fmt=fmtFor(clean.replace(/[*]/g,''));
+    const font=(fmt&&fmt.font)||BODYDEF.font||'Garamond';
+    const size=(fmt&&fmt.sz)||BODYDEF.sz||24;
+    const bold=fmt?!!fmt.bold:false, italics=fmt?!!fmt.italic:false;
+    const center=fmt?!!fmt.center:/^#\s/.test(line);
+    const isTitle = center && (size>=30 || /century/i.test(font));
+    const spacing = isTitle? {before:200,after:220} : {after:150, line:288, lineRule:'auto'};
+    const para=new Paragraph({alignment: center?AlignmentType.CENTER:AlignmentType.LEFT, spacing, children:mdInlineToRuns(D,clean,{font,size,bold,italics})});
+    return {para, isTitle};
+  };
+  let prevTitle=false;   // per non ripetere la barra tra titoli consecutivi (es. "Fase X" + titolo vero)
+  paras.forEach((p,i)=>{
+    if(isMdTableBlock(p)){ children.push(spacer(200)); children.push(mkTable(mdTableToMatrix(p))); children.push(spacer(240)); prevTitle=false; }
+    else p.split('\n').forEach(line=>{ const r=mkPara(line); if(r.isTitle && children.length && !prevTitle) children.push(mkDivider()); children.push(r.para); prevTitle=r.isTitle; });
+    (insByIdx[i]||[]).forEach(it=>{ children.push(imgPara(it)); prevTitle=false; });
+  });
+  // Grafiche senza àncora individuata: NON vengono inserite in fondo al documento (restano solo nel .pptx).
+  const doc=new Document({sections:[{properties:{page:{margin:{top:1134,bottom:1134,left:1134,right:1134}}}, children}]});
+  const blob=await Packer.toBlob(doc);
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=baseName()+'_revisionato_con_grafiche.docx'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+}
+async function buildPptx(reportName, items){
+  const pptx=new PptxGenJS(); pptx.defineLayout({name:'CL',width:13.333,height:7.5}); pptx.layout='CL';
+  let s=pptx.addSlide(); s.background={color:'F8F7F3'};
+  s.addText('Grafiche del report', {x:0.7,y:2.7,w:12,h:1,fontSize:40,bold:true,color:'1A1A1A',fontFace:'Georgia'});
+  s.addText(reportName, {x:0.7,y:3.8,w:12,h:0.6,fontSize:18,italic:true,color:'555555',fontFace:'Georgia'});
+  const SW=13.333,SH=7.5,mg=0.4,maxW=SW-2*mg,maxH=SH-2*mg;
+  (items||[]).forEach(it=>{ const sl=pptx.addSlide(); sl.background={color:'F8F7F3'};
+    if(it.png){ const ar=(it.w&&it.h)?it.w/it.h:(1200/700); let w=maxW,h=w/ar; if(h>maxH){h=maxH;w=h*ar;} sl.addImage({data:it.png, x:(SW-w)/2, y:(SH-h)/2, w:w, h:h}); }
+    else sl.addText(it.sig.titolo||'Grafica', {x:0.7,y:0.6,w:12,h:1,fontSize:24,bold:true,color:'1A1A1A'});
+  });
+  await pptx.writeFile({fileName: reportName.replace(/[^\w \-]/g,'').slice(0,60)+' — grafiche.pptx'});
+}
+async function approveAndGenerate(){
+  if(S.approved) return; S.approved=true;
+  document.querySelectorAll('.hunk .acts button').forEach(b=>b.disabled=true);
+  $('#btnApprove').disabled=true; const aj=$('#btnAcceptJudg'); if(aj) aj.disabled=true;
+  const sigs=collectSignals().filter(s=>s.gen!==false); const gl=$('#genlist'); gl.innerHTML='';
+  $('#genStatus').textContent = sigs.length? ('Revisione approvata. Carico le librerie e genero '+sigs.length+' grafiche (una chiamata ciascuna)…') : 'Revisione approvata. Nessuna grafica selezionata: esporto solo il documento…';
+  try{
+    await ensureLibs();
+    const items=await generateGraphics((done,total,spec,nSlides)=>{
+      $('#genStatus').textContent='Genero grafiche… segnalazione '+done+'/'+total;
+      const r=document.createElement('div'); r.className='strow done';
+      r.innerHTML='<span class="dot"></span><span class="nm">'+esc((spec&&spec.title)||('Segnalazione '+done))+'</span><span class="st">'+esc((spec&&spec.layout)||'grafica')+(nSlides>1?' ×'+nSlides:'')+'</span>';
+      gl.appendChild(r);
+    });
+    S.graphics=items;
+    const withImg=items.filter(x=>x.png).length;
+    $('#finalDownloads').classList.remove('hidden');
+    if(!items.length){
+      $('#genStatus').textContent='Nessuna grafica (per scelta o nessuna segnalazione). Esporto solo il documento revisionato…';
+      await buildDocx(items);
+      $('#genStatus').textContent='Documento revisionato (.docx) scaricato.';
+    } else {
+      $('#genStatus').textContent='Fatto: '+withImg+' slide generate da '+sigs.length+' segnalazioni. Scarico DOCX e PPTX…';
+      await buildDocx(items);
+      await buildPptx(footerName(''), items);
+      $('#genStatus').textContent='Fatto: '+withImg+' slide. File scaricati (ripeti coi tasti sotto se serve).';
+    }
+  }catch(e){ $('#genStatus').textContent='Errore in generazione: '+e.message; S.approved=false; $('#btnApprove').disabled=false; }
+}
+
+if(typeof module!=='undefined'){ module.exports={lcsOps,buildHunks,classify,parseOutput,stripMeta,splitWords,splitParas,wordOps,assembleSection,splitSections,htmlToBlocks,chunkSection,buildUnits,deterministicNormalize,costFromUsage,mdTableToMatrix,isMdTableBlock,matrixToHtmlTable,paraToDocHtml,findAnchorIndex,anchorContext,nearbyTable,parseSignalTable,parseSignalChart,classifySignalIsChart,accentFor,hexToRgba,slideHtml,layoutCards,layoutKpi,layoutTiers,layoutStatement,layoutTable,layoutBars,specToBody,specToSlides,parseSpecJSON,buildBody,chunk,safeInsertIndex,mdInlineToRuns,inlineMd,layoutIconCards,layoutSteps,layoutInfographic,layoutPie,iconSvg,iconKey,shade,parseParaFmt,normKey}; }
+</script>
+</body>
+</html>
